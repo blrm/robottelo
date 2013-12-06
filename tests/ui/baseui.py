@@ -109,16 +109,8 @@ class BaseUI(unittest.TestCase):
     def run(self, result=None):
         super(BaseUI, self).run(result)
 
-        if result.skipped:
-            try:
-                self.browser.quit()
-            except Exception, e:
-                pass
-
-            return result
-
         # create a sauceclient object to report pass/fail results
-        if "remote" in str(type(self.browser)):
+        '''if "remote" in str(type(self.browser)):
             sc = sauceclient.SauceClient(
                 self.sauce_user,
                 self.sauce_key)
@@ -140,9 +132,12 @@ class BaseUI(unittest.TestCase):
         else:
             if "remote" in str(type(self.browser)):
                 sc.jobs.update_job(
-                    self.browser.session_id, name=str(self), passed=True)
+                    self.browser.session_id, name=str(self), passed=True)'''
 
-        self.browser.quit()
+        try:
+            self.browser.quit()
+        except Exception, e:
+            pass
+
         self.browser = None
-
         return result
