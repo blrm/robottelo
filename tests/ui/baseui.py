@@ -57,7 +57,7 @@ class BaseUI(unittest.TestCase):
             else:
                 self.browser = webdriver.Remote()
         else:
-            desired_capabilities = {}
+            desired_capabilities = webdriver.DesiredCapabilities()
             desired_capabilities['browserName'] = os.environ['SELENIUM_BROWSER']
             desired_capabilities['version'] = os.getenv('SELENIUM_VERSION', '')
             desired_capabilities['platform'] = os.environ['SELENIUM_PLATFORM']
