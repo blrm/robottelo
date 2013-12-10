@@ -71,7 +71,7 @@ class BaseUI(unittest.TestCase):
             #    desired_capabilities['parent-tunnel'] = self.sauce_tunnel
             self.browser = webdriver.Remote(desired_capabilities=desired_capabilities,
                                             command_executor=command_executor)
-            self.browser.implicitly_wait(3)
+            # self.browser.implicitly_wait(3)
 
         self.browser.maximize_window()
         self.browser.get("https://" + self.host)
