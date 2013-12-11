@@ -33,9 +33,9 @@ class Base():
         except NoSuchElementException, e:
             self.logger.debug("Could not locate element '%s'." % locator[1])
             return None
-        except Exception, e:
-            self.logger.debug("Failed to locate element. ERROR: %s" % str(e))
-            return None
+        # except Exception, e:
+        #    self.logger.debug("Failed to locate element. ERROR: %s" % str(e))
+        #    return None
 
     def wait_until_element(self, locator, delay=20):
 

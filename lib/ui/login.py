@@ -16,16 +16,18 @@ class Login(Base):
 
         organization = organization or 'ACME_Corporation'
 
-        # if self.wait_until_element(locators["login.username"]):
-        txt_field = self.find_element(locators["login.username"])
-        txt_field.clear()
-        txt_field.send_keys(username)
-        txt_field = self.find_element(locators["login.password"])
-        txt_field.clear()
-        txt_field.send_keys(password)
-        self.find_element(locators["login.submit"]).click()
-        if self.find_element(locators["notif.error"]):
-            return
+        if self.wait_until_element(locators["login.username"]):
+            txt_field = self.find_element(locators["login.username"])
+            txt_field.clear()
+            txt_field.send_keys(username)
+            txt_field = self.find_element(locators["login.password"])
+            txt_field.clear()
+            txt_field.send_keys(password)
+
+            self.find_element(locators["login.submit"]).click()
+
+            if self.find_element(locators["notif.error"]):
+                return
 
     def logout(self):
         if self.find_element(locators["login.gravatar"]):
