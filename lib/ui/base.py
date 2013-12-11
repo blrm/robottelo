@@ -43,22 +43,9 @@ class Base():
         Wrapper around Selenium's WebDriver that allows you to pause your test
         until an element in the web page is present.
         """
-
-        try:
-            element = WebDriverWait(
-                self.browser, delay
-            ).until(EC.visibility_of_element_located(locator))
-            return element
-        except TimeoutException, e:
-            self.logger.debug(
-                "Timed out waiting for element '%s' to display." % locator[1])
-            return None
-        except NoSuchElementException, e:
-            self.logger.debug("Element '%s' was never found." % locator[1])
-            return None
-        except Exception, e:
-            self.logger.debug("Failed to locate element. ERROR: %s" % str(e))
-            return None
+        
+        element = WebDriverWait(self.browser, delay).until(EC.visibility_of_element_located(locator))
+        return element
 
     def ajax_complete(self, driver):
         try:
