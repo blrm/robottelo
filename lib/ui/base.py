@@ -18,24 +18,24 @@ class Base():
     logger = logging.getLogger("robottelo")
     logger.setLevel(int(conf.properties['nosetests.verbosity']))
 
-    def find_element(self, locator):
-        """
-        Wrapper around Selenium's WebDriver that allows you to search for an
-        element in the web page.
-        """
-
-        try:
-            _webelement = self.browser.find_element(*locator)
-            if _webelement.is_displayed():
-                return _webelement
-            else:
-                return None
-        except NoSuchElementException, e:
-            self.logger.debug("Could not locate element '%s'." % locator[1])
-            return None
-        # except Exception, e:
-        #    self.logger.debug("Failed to locate element. ERROR: %s" % str(e))
-        #    return None
+    # def find_element(self, locator):
+    #     """
+    #     Wrapper around Selenium's WebDriver that allows you to search for an
+    #     element in the web page.
+    #     """
+    #
+    #     try:
+    #         _webelement = self.browser.find_element(*locator)
+    #         if _webelement.is_displayed():
+    #             return _webelement
+    #         else:
+    #             return None
+    #     except NoSuchElementException, e:
+    #         self.logger.debug("Could not locate element '%s'." % locator[1])
+    #         return None
+    #     except Exception, e:
+    #         self.logger.debug("Failed to locate element. ERROR: %s" % str(e))
+    #         return None
 
     def wait_until_element(self, locator, delay=20):
 
