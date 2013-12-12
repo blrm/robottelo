@@ -39,7 +39,6 @@ class BaseUI(unittest.TestCase):
         self.sauce_user = conf.properties['saucelabs.username']
         self.sauce_key = conf.properties['saucelabs.key']
         self.sauce_os = conf.properties['saucelabs.os']
-        self.sauce_tunnel = conf.properties['saucelabs.tunnel']
         self.sauce_version = conf.properties['saucelabs.browser.version']
         self.locale = conf.properties['main.locale']
         self.verbosity = int(conf.properties['nosetests.verbosity'])
@@ -60,16 +59,17 @@ class BaseUI(unittest.TestCase):
             else:
                 self.browser = webdriver.Remote()
         else:
-            desired_capabilities = getattr(
-                webdriver.DesiredCapabilities, self.driver_name.upper())
-            desired_capabilities['version'] = self.sauce_version
-            desired_capabilities['platform'] = self.sauce_os
+            desired_capabilities = webdriver.DesiredCapabilities.FIREFOX
+            desired_capabilities['browserName'] = os.environ['SELENIUM_BROWSER']
+            desired_capabilities['version'] = os.getenv('SELENIUM_VERSION', '')
+            desired_capabilities['platform'] = os.environ['SELENIUM_PLATFORM']
 
-            if self.sauce_tunnel is not None:
-                desired_capabilities['parent-tunnel'] = self.sauce_tunnel
-            self.browser = webdriver.Remote(
-                desired_capabilities=desired_capabilities,
-                command_executor=SAUCE_URL % (self.sauce_user, self.sauce_key))
+            command_executor = "http://%s:%s@%s:%s/wd/hub" % (os.environ['SAUCE_USER_NAME'],
+                                                              os.environ['SAUCE_API_KEY'],
+                                                              os.environ['SELENIUM_HOST'],
+                                                              os.environ['SELENIUM_PORT'])
+            self.browser = webdriver.Remote(desired_capabilities=desired_capabilities,
+                                            command_executor=command_executor)
             self.browser.implicitly_wait(3)
 
         self.browser.maximize_window()
