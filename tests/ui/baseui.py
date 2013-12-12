@@ -111,7 +111,7 @@ class BaseUI(unittest.TestCase):
     def run(self, result=None):
         super(BaseUI, self).run(result)
 
-        if result.skipped:
+        if result.result.skipped:
             try:
                 self.browser.quit()
             except Exception, e:
@@ -125,7 +125,7 @@ class BaseUI(unittest.TestCase):
                 self.sauce_user,
                 self.sauce_key)
 
-        if result.failures or result.errors:
+        if result.result.failures or result.result.errors:
 
             # Take screenshot
             fname = str(self).replace(
