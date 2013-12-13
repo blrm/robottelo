@@ -147,7 +147,7 @@ class BaseUI(unittest.TestCase):
         #         sc.jobs.update_job(
         #             self.browser.session_id, name=str(self), passed=True)
 
-        self.browser.stop()
+        self.browser.quit()
         # self.browser = None
 
         return result
