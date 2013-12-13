@@ -73,7 +73,7 @@ class BaseUI(unittest.TestCase):
             #                                                   os.environ['SELENIUM_PORT'])
             # self.browser = webdriver.Remote(desired_capabilities=desired_capabilities,
             #                                 command_executor=command_executor)
-            self.browser = SeleniumFactory().createWebDriver()
+            self.browser = SeleniumFactory().createWebDriver(job_name=self.id(),show_session_id=True)
             #self.browser.implicitly_wait(3)
 
         self.browser.maximize_window()
