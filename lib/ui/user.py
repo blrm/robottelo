@@ -29,6 +29,8 @@ class User(Base):
             if locale:
                 Select(self.find_element(locators["users.language"])).select_by_value(locale)
             self.find_element(locators["submit"]).click()
+            self.wait_for_ajax()
+
 
     def search(self, username):
         # Make sure the user is present
@@ -54,6 +56,8 @@ class User(Base):
             else:
                 alert = self.browser.switch_to_alert()
                 alert.dismiss(self)
+            self.wait_for_ajax()
+
 
     def update(self, username, new_username=None, email=None, password=None,
                firstname=None, lastname=None, locale=None):
@@ -75,3 +79,4 @@ class User(Base):
                 self.field_update("users.password", password)
                 self.field_update("users.password_confirmation", password)
             self.find_element(locators["submit"]).click()
+            self.wait_for_ajax()
