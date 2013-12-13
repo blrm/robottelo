@@ -147,7 +147,6 @@ class BaseUI(unittest.TestCase):
         #     if "remote" in str(type(self.browser)):
         #         sc.jobs.update_job(
         #             self.browser.session_id, name=str(self), passed=True)
-        print sys.exc_info()
         self.browser.quit()
         # self.browser = None
 
