@@ -35,6 +35,7 @@ class Domain(BaseUI):
         name = generate_name(4) + '.com'
         description = domain % name
         self.create_domain(name, description)
+        self.assertIsNotNone(self.domain.search(description))
         self.domain.delete(name, really=True)
         self.assertTrue(self.user.wait_until_element(locators["notif.success"]))
 
@@ -45,6 +46,7 @@ class Domain(BaseUI):
         new_name = generate_name(4) + '.org'
         new_description = domain % new_name
         self.create_domain(name, description)
+        self.assertIsNotNone(self.domain.search(description))
         self.domain.update(name, new_name, new_description)
         # UI throwing 'PGError' while performing search
         # self.assertTrue(self, self.domain.search(new_description))

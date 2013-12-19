@@ -5,7 +5,7 @@
 """
 Test class for Partition Table UI
 """
-
+import unittest
 from robottelo.ui.locators import locators
 from robottelo.common.helpers import generate_name
 from tests.ui.baseui import BaseUI
@@ -34,6 +34,7 @@ class PartitionTable(BaseUI):
         self.login.login(self.katello_user, self.katello_passwd)
         self.navigator.go_to_partition_tables()
         self.partitiontable.create(name, layout, os_family)
+        self.assertIsNotNone(self.partitiontable.search(name))
         self.partitiontable.remove(name, really=True)
         self.assertTrue(self.user.wait_until_element(locators["notif.success"]))
 
@@ -48,5 +49,6 @@ class PartitionTable(BaseUI):
         self.login.login(self.katello_user, self.katello_passwd)
         self.navigator.go_to_partition_tables()
         self.partitiontable.create(name, layout, os_family)
+        self.assertIsNotNone(self.partitiontable.search(name))
         self.partitiontable.update(name, new_name, new_layout, new_os_family)
         self.assertIsNotNone(self, self.partitiontable.search(new_name))

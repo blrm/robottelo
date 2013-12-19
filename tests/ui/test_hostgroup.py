@@ -6,9 +6,9 @@
 """
 Test class for Host Group UI
 """
-
-from tests.ui.baseui import BaseUI
+import unittest
 from robottelo.common.helpers import generate_name
+from tests.ui.baseui import BaseUI
 
 
 class Hostgroup(BaseUI):
