@@ -8,6 +8,9 @@ Implements different locators for UI
 
 from selenium.webdriver.common.by import By
 
+def menu_locator(menu_item):
+    return "//div[contains(@style,'static') or contains(@style,'fixed')]//a[@id='%s']" % menu_item
+
 locators = {
 
     # Notifications
@@ -224,114 +227,114 @@ locators = {
     # Monitor Menu
     "menu.monitor": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='monitor_menu']"),
+        menu_locator("monitor_menu")),
     "menu.dashboard": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_dashboard']"),
+        menu_locator("menu_item_dashboard")),
     "menu.reports": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_reports']"),
+        menu_locator("menu_item_reports")),
     "menu.facts": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_fact_values']"),
+        menu_locator("menu_item_fact_values")),
     "menu.statistics": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_statistics']"),
+        menu_locator("menu_item_statistics")),
     "menu.trends": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_trends']"),
+        menu_locator("menu_item_trends")),
     "menu.audits": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_audits']"),
+        menu_locator("menu_item_audits")),
 
     # Hosts Menu
     "menu.hosts": (
         By.XPATH,
-        "//div[contains(@style,'static') or contains(@style,'fixed')]//a[@id='hosts_menu']"),  # @IgnorePep8
+        menu_locator("hosts_menu")),  # @IgnorePep8
     "menu.all_hosts": (
         By.XPATH,
-        "//div[contains(@style,'static') or contains(@style,'fixed')]//a[@id='menu_item_hosts']"),  # @IgnorePep8
+        menu_locator("menu_item_hosts")),  # @IgnorePep8
     "menu.operating_systems": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_operatingsystems']"),   # @IgnorePep8
+        menu_locator("menu_item_operatingsystems")),   # @IgnorePep8
     "menu.provisioning_templates": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_config_templates']"),   # @IgnorePep8
+        menu_locator("menu_item_config_templates")),   # @IgnorePep8
     "menu.partition_tables": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_ptables']"),
+        menu_locator("menu_item_ptables")),   # @IgnorePep8
     "menu.installation_media": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_media']"),
+        menu_locator("menu_item_media")),   # @IgnorePep8
     "menu.hardware_models": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_models']"),
+        menu_locator("menu_item_models")),   # @IgnorePep8
     "menu.architectures": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_architectures']"),
+        menu_locator("menu_item_architectures")),   # @IgnorePep8
 
     # Configure Menu
     "menu.configure": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='configure_menu']"),
+        menu_locator("configure_menu")),
     "menu.host_groups": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_hostgroups']"),
+        menu_locator("menu_item_hostgroups")),
     "menu.global_parameters": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_common_parameters']"),  # @IgnorePep8
+        menu_locator("menu_item_common_parameters")),  # @IgnorePep8
     "menu.environments": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_environments']"),
+        menu_locator("menu_item_environments")),
     "menu.puppet_classes": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_puppetclasses']"),
+        menu_locator("menu_item_puppetclasses")),
     "menu.smart_variables": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_lookup_keys']"),
+        menu_locator("menu_item_lookup_keys")),
 
     # Infrastructure Menu
     "menu.infrastructure": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='infrastructure_menu']"),
+        menu_locator("infrastructure_menu")),
     "menu.smart_proxies": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_smart_proxies']"),
+        menu_locator("menu_item_smart_proxies")),
     "menu.compute_resources": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_compute_resources']"),  # @IgnorePep8
+        menu_locator("menu_item_compute_resources")),  # @IgnorePep8
     "menu.subnets": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_subnets']"),
+        menu_locator("menu_item_subnets")),
     "menu.domains": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_domains']"),
+        menu_locator("menu_item_domains")),
 
     # Administer Menu
     "menu.administer": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='administer_menu']"),
+        menu_locator("administer_menu")),
     "menu.ldap_auth": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_auth_source_ldaps']"),  # @IgnorePep8
+        menu_locator("menu_item_auth_source_ldaps")),  # @IgnorePep8
     "menu.users": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_users']"),
+        menu_locator("menu_item_users")),
     "menu.user_groups": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_usergroups']"),
+        menu_locator("menu_item_usergroups")),
     "menu.roles": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_roles']"),
+        menu_locator("menu_item_roles")),
     "menu.bookmarks": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_bookmarks']"),
+        menu_locator("menu_item_bookmarks")),
     "menu.settings": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_settings']"),
+        menu_locator("menu_item_settings")),
     "menu.about": (
         By.XPATH,
-        "//div[contains(@style,'static')]//a[@id='menu_item_about_index']"),
+        menu_locator("menu_item_about_index")),
 
     # Account Menu
     "menu.account": (
