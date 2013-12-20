@@ -8,6 +8,8 @@ Implements Operating System UI
 
 from robottelo.ui.base import Base
 from robottelo.ui.locators import locators
+from selenium.webdriver.common.keys import Keys
+
 
 
 class OperatingSys(Base):

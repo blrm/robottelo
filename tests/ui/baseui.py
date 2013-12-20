@@ -102,21 +102,8 @@ class BaseUI(unittest.TestCase):
 
     def run(self, result=None):
         super(BaseUI, self).run(result)
-
-        try:
-            if result.skipped:
-                try:
-                    self.browser.quit()
-                except Exception:
-                    pass
-
-                return result
-        except AttributeError:
-            pass
-
         try:
             if result.failures or result.errors:
-
                 # Take screenshot
                 fname = str(self).replace(
                     "(", "").replace(")", "").replace(" ", "_")
@@ -127,7 +114,10 @@ class BaseUI(unittest.TestCase):
         except:
             pass
 
-        self.browser.quit()
-        self.browser = None
+        try:
+            self.browser.quit()
+            self.browser = None
+        except:
+            pass
 
         return result

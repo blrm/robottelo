@@ -27,6 +27,7 @@ class Environment(Base):
         if self.wait_until_element(locators["env.name"]):
             self.find_element(locators["env.name"]).send_keys(name)
         self.find_element(locators["submit"]).click()
+        self.wait_for_ajax()
 
     def delete(self, name, really):
         """
@@ -45,11 +46,13 @@ class Environment(Base):
             else:
                 alert = self.browser.switch_to_alert()
                 alert.dismiss()
+        self.wait_for_ajax()
 
     def search(self, name):
         """
         Searches for the environment.
         """
+        env = None
         searchbox = self.wait_until_element(locators["search"])
         if searchbox:
             searchbox.clear()

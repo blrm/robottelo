@@ -51,5 +51,6 @@ class Architecture(BaseUI):
         self.create_os(new_osname, major_version)
         self.navigator.go_to_architectures()  # go to architecture page
         self.architecture.create(oldname)
+        self.assertTrue(self, self.architecture.search(oldname))
         self.architecture.update(oldname, newname, new_osname)
         self.assertTrue(self, self.architecture.search(newname))
