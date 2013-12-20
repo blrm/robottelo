@@ -40,6 +40,17 @@ class OperatingSys(Base):
             self.find_element(locators["operatingsys.submit"]).click()
             self.wait_for_ajax()
 
+    def search(self, name):
+        os = None
+        searchbox = self.wait_until_element(locators["search"])
+        if searchbox:
+            searchbox.clear()
+            searchbox.send_keys(name)
+            searchbox.send_keys(Keys.RETURN)
+            os = self.wait_until_element((locators["operatingsys.os"][0],
+                                          locators["operatingsys.os"][1] % name))
+        return os
+
     def delete(self, osname, really):
         element = self.wait_until_element((locators
                                            ["operatingsys.delete"][0],

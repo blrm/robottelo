@@ -29,7 +29,7 @@ class Hostgroup(BaseUI):
         #confirm the Hostgroup appears in the UI
         self.assertTrue(self.hostgroup.search(name))
         self.hostgroup.delete(name, really=True)
-        self.assertIsNone(self.hostgroup.search(name))
+        self.assertFalse(self.hostgroup.search(name))
 
     def test_update_hostgroup(self):
         name = generate_name(7)

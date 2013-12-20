@@ -31,7 +31,7 @@ class Subnet(BaseUI):
         subnet_mask = "255.255.255.0"
         self.login.login(self.katello_user, self.katello_passwd)
         self.create_subnet(subnet_name, subnet_network, subnet_mask)
-        self.assertTrue(self.search_subnet(subnet_name))
+        self.assertTrue(self.subnet.search(subnet_name))
 
     def test_remove_subnet_1(self):
         "Delete subnet - Create subnet and delete the same"
@@ -40,9 +40,10 @@ class Subnet(BaseUI):
         subnet_mask = "255.255.255.0"
         self.login.login(self.katello_user, self.katello_passwd)
         self.create_subnet(subnet_name, subnet_network, subnet_mask)
+        self.assertTrue(self.subnet.search(subnet_name))
         self.subnet.remove(subnet_name, True)
         #TODO: Unable to capture the success message for now
-        self.assertFalse(self.search_subnet(subnet_name))
+        self.assertFalse(self.subnet.search(subnet_name))
 
     def test_remove_subnet_2(self):
         "Delete subnet - Create subnet. Attempt to delete subnet but cancel \
@@ -52,20 +53,22 @@ class Subnet(BaseUI):
         subnet_mask = "255.255.255.0"
         self.login.login(self.katello_user, self.katello_passwd)
         self.create_subnet(subnet_name, subnet_network, subnet_mask)
+        self.assertTrue(self.subnet.search(subnet_name))
         self.subnet.remove(subnet_name, False)
-        self.assertTrue(self.search_subnet(subnet_name))
+        self.assertTrue(self.subnet.search(subnet_name))
 
     def test_update_subnet_1(self):
         "Update subnet name"
         subnet_name = generate_name(8, 8)
+        new_subnet_name = generate_name(8, 8)
         subnet_network = generate_ipaddr(ip3=True)
         subnet_mask = "255.255.255.0"
         self.login.login(self.katello_user, self.katello_passwd)
         self.create_subnet(subnet_name, subnet_network, subnet_mask)
-        new_subnet_name = generate_name(8, 8)
+        self.assertTrue(self.subnet.search(subnet_name))
         self.subnet.update(subnet_name, new_subnet_name, None, None)
-        result_object = self.search_subnet(new_subnet_name)
-        self.assertEqual(new_subnet_name, result_object['name'])
+        self.assertTrue(self.subnet.search(new_subnet_name))
+
 
     def test_update_subnet_2(self):
         "Update subnet network"

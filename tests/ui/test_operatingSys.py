@@ -35,5 +35,6 @@ class OperatingSys(BaseUI):
         self.login.login(self.katello_user, self.katello_passwd)  # login
         self.navigator.go_to_operating_systems()  # go to operating system page
         self.operatingsys.create(name, major_version, minor_version, os_family)
+        self.assertTrue(self.operatingsys.search(name))
         self.operatingsys.delete(name, really=True)
-        self.assertTrue(self.user.wait_until_element(locators["notif.success"]))
+        self.assertFalse(self.operatingsys.search(name))
