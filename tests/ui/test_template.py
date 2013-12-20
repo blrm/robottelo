@@ -23,4 +23,4 @@ class Template(BaseUI):
         self.template.create(name, os_list, True,
                              template_path="~/anaconda-ks.cfg",
                              template_type="provision")
-        self.assertIsNotNone(self.template.search(name))
+        self.assertTrue(self.template.search(name))

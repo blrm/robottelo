@@ -19,7 +19,7 @@ class Hostgroup(BaseUI):
         self.navigator.go_to_host_groups()
         self.hostgroup.create(name)
         #confirm the Hostgroup appears in the UI
-        self.assertIsNotNone(self.hostgroup.search(name))
+        self.assertTrue(self.hostgroup.search(name))
 
     def test_delete_hostgroup(self):
         name = generate_name(8)
@@ -27,7 +27,7 @@ class Hostgroup(BaseUI):
         self.navigator.go_to_host_groups()
         self.hostgroup.create(name)
         #confirm the Hostgroup appears in the UI
-        self.assertIsNotNone(self.hostgroup.search(name))
+        self.assertTrue(self.hostgroup.search(name))
         self.hostgroup.delete(name, really=True)
         self.assertIsNone(self.hostgroup.search(name))
 
@@ -38,6 +38,6 @@ class Hostgroup(BaseUI):
         self.navigator.go_to_host_groups()
         self.hostgroup.create(name)
         #confirm the Hostgroup appears in the UI
-        self.assertIsNotNone(self.hostgroup.search(name))
+        self.assertTrue(self.hostgroup.search(name))
         self.hostgroup.update(name, new_name=updated_name)
-        self.assertIsNotNone(self.hostgroup.search(updated_name))
+        self.assertTrue(self.hostgroup.search(updated_name))

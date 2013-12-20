@@ -31,7 +31,7 @@ class Subnet(BaseUI):
         subnet_mask = "255.255.255.0"
         self.login.login(self.katello_user, self.katello_passwd)
         self.create_subnet(subnet_name, subnet_network, subnet_mask)
-        self.assertIsNotNone(self.search_subnet(subnet_name))
+        self.assertTrue(self.search_subnet(subnet_name))
 
     def test_remove_subnet_1(self):
         "Delete subnet - Create subnet and delete the same"

@@ -25,7 +25,7 @@ class Host(BaseUI):
                           memory="768 MB")
         self.navigator.go_to_hosts()
         #confirm the Host appears in the UI
-        self.assertIsNotNone(self.hosts.search(name))
+        self.assertTrue(self.hosts.search(name))
 
     @unittest.skip("Test needs to create other required stuff")
     def test_create_delete(self):
