@@ -80,3 +80,4 @@ class Base():
         txt_field = self.find_element(locators[loc_string])
         txt_field.clear()
         txt_field.send_keys(newtext)
+
