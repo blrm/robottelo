@@ -24,6 +24,7 @@ class Navigator(Base):
 
         if menu_element:
             ActionChains(self.browser).move_to_element(menu_element).perform()
+            self.wait_for_ajax()
             submenu_element = self.find_element(sub_menu_locator)
             if submenu_element:
                 submenu_element.click()
