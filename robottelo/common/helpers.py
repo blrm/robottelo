@@ -109,6 +109,18 @@ def generate_mac(delimiter=":"):
     return mac
 
 
+class STR:
+    """Stores constants to be used in generate_string function
+    """
+
+    alphanumeric = "alphanumeric"
+    alpha = "alpha"
+    numeric = "numeric"
+    html = "html"
+    latin1 = "latin1"
+    utf8 = "utf8"
+
+
 def generate_string(str_type, length):
     '''
     This function will allow creation of a wide variety of string types,
@@ -241,11 +253,9 @@ def get_data_file(filename):
             "Couldn't locate the data file '%s'" % data_file)
 
 
-def read_partition_script(filename):
+def read_data_file(filename):
     """
-    Read the contents of partition table script
-    filename : constant value of partition script file
-                e.g. PARTITION_SCRIPT_DATA_FILE
+    Read the contents of data file
     """
     absolute_file_path = get_data_file(filename)
     with open(absolute_file_path, 'r') as file_contents:
