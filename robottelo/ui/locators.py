@@ -263,6 +263,13 @@ menu_locators = LocatorDict({
         ("//div[contains(@style,'static') or contains(@style,'fixed')]"
          "//a[@href='/redhat_access/insights/manage']")),
 
+    # RHCI Menu
+    "menu.rhci_installer": (
+        By.XPATH, "//li[@id='ember650' or @id='ember658']/a"),
+    "menu.rhci_deployments": (
+        By.XPATH, "//a[@id='ember664' or @id='ember672']"),
+    "menu.new_deployment": (
+        By.XPATH, "//a[@id='ember665' or @id='ember673']"),
 
     # Administer Menu
     "menu.administer": (

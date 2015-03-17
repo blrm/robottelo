@@ -283,6 +283,14 @@ class Navigator(Base):
             menu_locators['menu.domains'],
         )
 
+    def go_to_rhci_deployments(self):
+        self.find_element(menu_locators["menu.rhci_installer"]).click()
+        self.find_element(menu_locators["menu.rhci_deployments"]).click()
+
+    def go_to_new_deployment(self):
+        self.find_element(menu_locators["menu.rhci_installer"]).click()
+        self.find_element(menu_locators["menu.new_deployment"]).click()
+
     def go_to_ldap_auth(self):
         self.menu_click(
             menu_locators['menu.administer'], menu_locators['menu.ldap_auth'],
