@@ -60,6 +60,8 @@ from robottelo.ui.products import Products
 from robottelo.ui.puppetclasses import PuppetClasses
 from robottelo.ui.repository import Repos
 from robottelo.ui.rhai import RHAI
+
+from robottelo.ui.rhci import RHCI
 from robottelo.ui.role import Role
 from robottelo.ui.settings import Settings
 from robottelo.ui.subnet import Subnet
@@ -224,7 +226,9 @@ class UITestCase(TestCase):
         self.puppetclasses = PuppetClasses(self.browser)
         self.products = Products(self.browser)
         self.repository = Repos(self.browser)
+
         self.rhai = RHAI(self.browser)
+        self.rhci = RHCI(self.browser)
         self.role = Role(self.browser)
         self.settings = Settings(self.browser)
         self.subnet = Subnet(self.browser)

@@ -1927,6 +1927,102 @@ locators = LocatorDict({
     "config_groups.delete": (
         By.XPATH, "//a[@class='delete' and contains(@data-confirm, '%s')]"),
 
+    # RHCI
+    "rhci.new": (
+        By.XPATH, "//a[contains(.,'New Deployment')]"),
+    "rhci.next": (
+        By.XPATH, "//a[contains(.,'Next') and contains(@class, 'btn-primary') and not(contains(@class, 'disabled'))]"),
+    "rhci.satellite_name": (
+        By.XPATH,
+        ("//div[@class='form-group']/label[contains(.,'Name')]"
+        "/following-sibling::div/input")),
+    "rhci.satellite_description": (
+        By.XPATH,
+        ("//div[@class='form-group']/label[contains(.,'Description')]"
+        "/following-sibling::div/textarea")),
+    "rhci.deployment_org": (
+        By.XPATH, "//input[@name='deployment-organization']"),
+    "rhci.env_path": (
+        By.XPATH, "//div[@class='path-selector']//label[contains(.,'%s')]"),
+    "rhci.hypervisor_mac_check": (
+        By.XPATH, "//td[contains(.,'%s')]/../td/input"),
+    "rhci.rhevtab_engine": (
+        By.XPATH,
+        ("//ul[contains(@class,'nav-pills')]"
+         "//a[contains(.,'2B. Engine')]")),
+    "rhci.rhevtab_configuration": (
+        By.XPATH,
+        ("//ul[contains(@class,'nav-pills')]"
+         "//a[contains(.,'2C. Configuration')]")),
+    "rhci.rhevtab_storage": (
+        By.XPATH,
+        ("//ul[contains(@class,'nav-pills')]"
+         "//a[contains(.,'2D. Storage')]")),
+    "rhci.engine_mac_radio": (
+        By.XPATH, "//td[contains(.,'%s')]/../td/input"),
+    "rhci.rhevh_hostname": (
+        By.XPATH,
+        ("//div[@class='form-group']/label[contains(.,'Hypervisor Host Name')]"
+        "/following-sibling::div/input")),
+    "rhci.rhevm_hostname": (
+        By.XPATH,
+        ("//div[@class='form-group']/label[contains(.,'Engine Host Name')]"
+        "/following-sibling::div/input")),
+    "rhci.rhevm_adminpass": (
+        By.XPATH,
+        ("//div[@class='form-group']/label[contains(.,'Engine admin password')]"
+        "/following-sibling::div/input")),
+    "rhci.datacenter_name": (
+        By.XPATH,
+        ("//div[@class='form-group']/label[contains(.,'Datacenter Name')]"
+        "/following-sibling::div/input")),
+    "rhci.cluster_name": (
+        By.XPATH,
+        ("//div[@class='form-group']/label[contains(.,'Cluster Name')]"
+        "/following-sibling::div/input")),
+    "rhci.storage_name": (
+        By.XPATH,
+        ("//div[@class='form-group']/label[contains(.,'Storage name')]"
+        "/following-sibling::div/input")),
+    "rhci.cpu_type": (
+        By.XPATH,
+        ("//div[@class='form-group']/label[contains(.,'CPU Type')]"
+        "/following-sibling::div/input")),
+    "rhci.storage_type": (
+        By.XPATH,
+        ("//input[@type='radio' and contains(@value, '%s')]")),
+    "rhci.storage_address": (
+        By.XPATH,
+        ("//div[@class='form-group']/label[contains(.,'Storage Address')]"
+        "/following-sibling::div/input")),
+    "rhci.share_path": (
+        By.XPATH,
+        ("//div[@class='form-group']/label[contains(.,'Share Path')]"
+        "/following-sibling::div/input")),
+    "rhci.bc_cloudforms": (
+        By.XPATH,
+        "//div[@class='wizard-block']//li[contains(.,'CloudForms')]/div"),
+    "rhci.bc_subscriptions": (
+        By.XPATH,
+        "//div[@class='wizard-block']//li[contains(.,'Subscriptions')]/div"),
+    "rhci.cfme_install_on": (
+        By.XPATH,
+        "//input[@type='radio' and contains(@value,'%s')]"),
+    "rhci.rhsm_username": (
+        By.XPATH,
+        ("//div[@class='form-group']/label[contains(.,'Username')]"
+        "/following-sibling::div/input")),
+    "rhci.rhsm_password": (
+        By.XPATH,
+        ("//div[@class='form-group']/label[contains(.,'Password')]"
+        "/following-sibling::div/input")),
+    "rhci.subscription_check": (
+        By.XPATH, "//td[contains(.,'%s')]/../td/input"),
+    "rhci.subscription_attach": (
+        By.XPATH, "//button[contains(.,'Attach Selected')]"),
+    "rhci.deploy": (
+        By.XPATH, "//button[contains(.,'Deploy')]"),
+
     # Hardware Models
     "hwmodels.new": (
         By.XPATH, "//a[@data-id='aid_models_new']"),
