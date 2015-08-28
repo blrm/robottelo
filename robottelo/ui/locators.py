@@ -265,11 +265,17 @@ menu_locators = LocatorDict({
 
     # RHCI Menu
     "menu.rhci_installer": (
-        By.XPATH, "//li[@id='ember650' or @id='ember658']/a"),
+        By.XPATH,
+        ("//div[contains(@style,'static') or contains(@style,'fixed')]"
+         "//a[@id='fusor_menu']")),
     "menu.rhci_deployments": (
-        By.XPATH, "//a[@id='ember664' or @id='ember672']"),
+        By.XPATH,
+        ("//div[contains(@style,'static') or contains(@style, 'fixed')]"
+         "//a[@id='menu_item_fusor_deployments']")),
     "menu.new_deployment": (
-        By.XPATH, "//a[@id='ember665' or @id='ember673']"),
+        By.XPATH,
+        ("//div[contains(@style,'static') or contains(@style, 'fixed')]"
+         "//a[@id='menu_item_new_fusor_deployment']")),
 
     # Administer Menu
     "menu.administer": (
@@ -1932,18 +1938,23 @@ locators = LocatorDict({
         By.XPATH, "//a[contains(.,'New Deployment')]"),
     "rhci.next": (
         By.XPATH, "//a[contains(.,'Next') and contains(@class, 'btn-primary') and not(contains(@class, 'disabled'))]"),
+    # TODO: file a bug for this (next button is sometimes <a>, sometimes <button> )
+    "rhci.lifecycle_next": (
+        By.XPATH, "//button[contains(.,'Next') and contains(@class, 'btn-primary')and not(contains(@class, 'disabled'))]"),
+    "rhci.select": (
+        By.XPATH, "//a[contains(.,'Select') and contains(@class, 'btn-primary') and not(contains(@class, 'disabled'))]"),
     "rhci.satellite_name": (
-        By.XPATH,
-        ("//div[@class='form-group']/label[contains(.,'Name')]"
-        "/following-sibling::div/input")),
+        By.XPATH, "//input[@id='deployment_new_sat_name']"),
     "rhci.satellite_description": (
-        By.XPATH,
-        ("//div[@class='form-group']/label[contains(.,'Description')]"
-        "/following-sibling::div/textarea")),
+        By.XPATH, "//textarea[@id='deployment_new_sat_desc']"),
     "rhci.deployment_org": (
         By.XPATH, "//input[@name='deployment-organization']"),
+    "rhci.use_default_org_view": (
+        By.XPATH, "//input[@name='useDefaultOrgViewForEnv']"),
     "rhci.env_path": (
-        By.XPATH, "//div[@class='path-selector']//label[contains(.,'%s')]"),
+        By.XPATH, "//div[@class='path-selector']//span[contains(.,'%s')]"),
+    "rhci.rhev_setup_type": (
+        By.XPATH, "//input[@value='%s']"),
     "rhci.hypervisor_mac_check": (
         By.XPATH, "//td[contains(.,'%s')]/../td/input"),
     "rhci.rhevtab_engine": (
@@ -1960,30 +1971,15 @@ locators = LocatorDict({
          "//a[contains(.,'2D. Storage')]")),
     "rhci.engine_mac_radio": (
         By.XPATH, "//td[contains(.,'%s')]/../td/input"),
-    "rhci.rhevh_hostname": (
-        By.XPATH,
-        ("//div[@class='form-group']/label[contains(.,'Hypervisor Host Name')]"
-        "/following-sibling::div/input")),
-    "rhci.rhevm_hostname": (
-        By.XPATH,
-        ("//div[@class='form-group']/label[contains(.,'Engine Host Name')]"
-        "/following-sibling::div/input")),
+    "rhci.rhev_root_pass": (
+        By.XPATH, "//input[@id='rhev_root_password']"),
     "rhci.rhevm_adminpass": (
-        By.XPATH,
-        ("//div[@class='form-group']/label[contains(.,'Engine admin password')]"
-        "/following-sibling::div/input")),
+        By.XPATH, "//input[@id='rhev_engine_admin_password']"),
+    # TODO: File BZ (datacenter != database)
     "rhci.datacenter_name": (
-        By.XPATH,
-        ("//div[@class='form-group']/label[contains(.,'Datacenter Name')]"
-        "/following-sibling::div/input")),
+        By.XPATH, "//input[@id='rhev_database_name']"),
     "rhci.cluster_name": (
-        By.XPATH,
-        ("//div[@class='form-group']/label[contains(.,'Cluster Name')]"
-        "/following-sibling::div/input")),
-    "rhci.storage_name": (
-        By.XPATH,
-        ("//div[@class='form-group']/label[contains(.,'Storage name')]"
-        "/following-sibling::div/input")),
+        By.XPATH, "//input[@id='rhev_cluster_name']"),
     "rhci.cpu_type": (
         By.XPATH,
         ("//div[@class='form-group']/label[contains(.,'CPU Type')]"
@@ -1991,14 +1987,18 @@ locators = LocatorDict({
     "rhci.storage_type": (
         By.XPATH,
         ("//input[@type='radio' and contains(@value, '%s')]")),
-    "rhci.storage_address": (
-        By.XPATH,
-        ("//div[@class='form-group']/label[contains(.,'Storage Address')]"
-        "/following-sibling::div/input")),
-    "rhci.share_path": (
-        By.XPATH,
-        ("//div[@class='form-group']/label[contains(.,'Share Path')]"
-        "/following-sibling::div/input")),
+    "rhci.data_domain_name": (
+        By.XPATH, "//input[@id='rhev_storage_name']"),
+    "rhci.export_domain_name": (
+        By.XPATH, "//input[@id='rhev_export_domain_name']"),
+    "rhci.data_domain_address": (
+        By.XPATH, "//input[@id='rhev_storage_address']"),
+    "rhci.export_domain_address": (
+        By.XPATH, "//input[@id='rhev_export_domain_address']"),
+    "rhci.data_domain_share_path": (
+        By.XPATH, "//input[@id='rhev_share_path']"),
+    "rhci.export_domain_share_path": (
+        By.XPATH, "//input[@id='rhev_export_domain_path']"),
     "rhci.bc_cloudforms": (
         By.XPATH,
         "//div[@class='wizard-block']//li[contains(.,'CloudForms')]/div"),
@@ -2006,16 +2006,20 @@ locators = LocatorDict({
         By.XPATH,
         "//div[@class='wizard-block']//li[contains(.,'Subscriptions')]/div"),
     "rhci.cfme_install_on": (
-        By.XPATH,
-        "//input[@type='radio' and contains(@value,'%s')]"),
+        By.XPATH, "//input[@type='radio' and @value='%s']"),
+    "rhci.cfme_root_password": (
+        By.XPATH, "//input[@id='cfme_root_password']"),
+    # TODO: File BZ, these rhsm inputs need IDs.
     "rhci.rhsm_username": (
         By.XPATH,
-        ("//div[@class='form-group']/label[contains(.,'Username')]"
+        ("//div[contains(@class,'form-group')]/label[contains(.,'Red Hat login')]"
         "/following-sibling::div/input")),
     "rhci.rhsm_password": (
         By.XPATH,
-        ("//div[@class='form-group']/label[contains(.,'Password')]"
+        ("//div[contains(@class,'form-group')]/label[contains(.,'Password')]"
         "/following-sibling::div/input")),
+    "rhci.rhsm_satellite_radio": (
+        By.XPATH, "//input[@type='radio' and contains(@value, '%s')]"),
     "rhci.subscription_check": (
         By.XPATH, "//td[contains(.,'%s')]/../td/input"),
     "rhci.subscription_attach": (

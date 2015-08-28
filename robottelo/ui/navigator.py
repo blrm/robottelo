@@ -284,12 +284,16 @@ class Navigator(Base):
         )
 
     def go_to_rhci_deployments(self):
-        self.find_element(menu_locators["menu.rhci_installer"]).click()
-        self.find_element(menu_locators["menu.rhci_deployments"]).click()
+        self.menu_click(
+            menu_locators["menu.rhci_installer"],
+            menu_locators["menu.rhci_deployments"],
+        )
 
     def go_to_new_deployment(self):
-        self.find_element(menu_locators["menu.rhci_installer"]).click()
-        self.find_element(menu_locators["menu.new_deployment"]).click()
+        self.menu_click(
+            menu_locators["menu.rhci_installer"],
+            menu_locators["menu.new_deployment"],
+        )
 
     def go_to_ldap_auth(self):
         self.menu_click(
