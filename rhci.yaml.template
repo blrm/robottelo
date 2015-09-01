@@ -1,0 +1,25 @@
+wizard:
+  sat_name: satellite_foo
+  sat_desc: satellite_desc
+  env_path: Library 
+  rhev_setup_type: rhevhost # value is either rhevhost or selfhost
+  rhevh_macs:
+    - AA:AA:AA:AA:AA:AA
+    - AA:AA:AA:AA:AA:AB
+  rhevm_mac: AA:AA:AA:AA:AA:AC
+  rhevh_hostname: my_rhevh
+  rhevm_hostname: my_rhevm
+  rhevm_adminpass: PASSWORD
+  rhsm_username: USER
+  rhsm_password: PASS
+  rhsm_satellite_uuid:  #UUID of the satellite being used for this rhsm account
+  rhsm_subs:
+    - Red Hat Cloud Infrastructure with Smart Management, Premium (2-sockets)
+  data_domain_name: my_data_domain
+  export_domain_name: my_export_domain
+  data_domain_address: example.com
+  export_domain_address: example.com
+  data_domain_share_path: /exports/my_data_domain
+  export_domain_share_path: /exports/my_export_domain
+  cfme_install_loc: RHEV #RHEV is the only option for this currently
+  cfme_root_password: PASSWORD

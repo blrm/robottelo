@@ -115,4 +115,4 @@ class RHCI(Base):
                                          locators["rhci.subscription_check"][1] % sub)).click()
         self.wait_until_element(locators["rhci.lifecycle_next"]).click()
         # RCHI: Review Installation page.
-        # self.wait_until_element(locators["rhci.deploy"]).click()
+        self.wait_until_element(locators["rhci.deploy"]).click()
