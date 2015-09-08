@@ -189,6 +189,13 @@ class UITestCase(TestCase):
                 self.browser = webdriver.PhantomJS(
                     service_args=service_args
                 )
+            elif self.driver_name.lower() == 'wharf':
+                # set this test class's browser using the cfme_tests framework and config
+                # sort of a dirty hack, but it gets things moving, which is what we need
+                # to get here, main.remote must be 1, and sauce.driver must be wharf
+                # Note that this will cause the browser to be reused, contrary to the docstring
+                from utils.browser import ensure_browser_open
+                self.browser = ensure_browser_open()
             else:
                 self.browser = webdriver.Remote()
         else:

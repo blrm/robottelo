@@ -1937,10 +1937,7 @@ locators = LocatorDict({
     "rhci.new": (
         By.XPATH, "//a[contains(.,'New Deployment')]"),
     "rhci.next": (
-        By.XPATH, "//a[contains(.,'Next') and contains(@class, 'btn-primary') and not(contains(@class, 'disabled'))]"),
-    # TODO: file a bug for this (next button is sometimes <a>, sometimes <button> )
-    "rhci.lifecycle_next": (
-        By.XPATH, "//button[contains(.,'Next') and contains(@class, 'btn-primary')and not(contains(@class, 'disabled'))]"),
+        By.XPATH, "(//a|//button)[contains(.,'Next') and contains(@class, 'btn-primary') and not(contains(@class, 'disabled'))]"),
     "rhci.select": (
         By.XPATH, "//a[contains(.,'Select') and contains(@class, 'btn-primary') and not(contains(@class, 'disabled'))]"),
     "rhci.satellite_name": (
@@ -2007,6 +2004,8 @@ locators = LocatorDict({
         "//div[@class='wizard-block']//li[contains(.,'Subscriptions')]/div"),
     "rhci.cfme_install_on": (
         By.XPATH, "//input[@type='radio' and @value='%s']"),
+    "rhci.cfme_admin_password": (
+        By.XPATH, "//input[@id='cfme_admin_password']"),
     "rhci.cfme_root_password": (
         By.XPATH, "//input[@id='cfme_root_password']"),
     # TODO: File BZ, these rhsm inputs need IDs.
