@@ -4,10 +4,16 @@
 """
 Implements RHCI UI
 """
-from time import sleep
-
 from robottelo.ui.base import Base
 from robottelo.ui.locators import locators
+
+
+def interp_loc(locator_name, interpolate_string):
+    # given a locator name, return a locator tuple with the interpolate string
+    # included in the second tuple element
+    # if the string is None or otherwise Falsey, make it an empty string
+    interpolate_string = interpolate_string or ''
+    return (locators[locator_name][0], locators[locator_name][1] % interpolate_string)
 
 
 class RHCI(Base):
@@ -21,103 +27,112 @@ class RHCI(Base):
                datacenter_name=None, cluster_name=None, cpu_type=None, storage_type=None,
                data_domain_name=None, export_domain_name=None, data_domain_address=None,
                export_domain_address=None, data_domain_share_path=None,
-               export_domain_share_path=None,cfme_install_loc=None,
+               export_domain_share_path=None, cfme_install_loc=None,
                cfme_root_password=None, cfme_admin_password=None):
         """
         Creates a new RHCI deployment with the provided details.
         """
+        # Build up dynamic locators:
+        env_path_loc = interp_loc('rhci.env_path', env_path)
+        rhev_setup_loc = interp_loc('rhci.rhev_setup_type', rhev_setup_type)
+        rhevm_mac_loc = interp_loc('rhci.engine_mac_radio', rhevm_mac)
+        rhevh_mac_locs = [interp_loc('rhci.hypervisor_mac_check', mac) for mac in rhevh_macs]
+        # cfme_install_loc is a kwargs, apologies for the potential confusion
+        cfme_install_locator = interp_loc('rhci.cfme_install_on', cfme_install_loc)
+        rhsm_sat_radio_loc = interp_loc('rhci.rhsm_satellite_radio', rhsm_satellite_uuid)
+        sub_check_locs = [interp_loc('rhci.subscription_check', sub) for sub in rhsm_subs]
+
         # RHCI: software selection page
-        self.wait_until_element(locators["rhci.select"]).click()
+        self.click(locators["rhci.select"])
+
         # RHCI: Satellite Configuration
         if self.wait_until_element(locators["rhci.satellite_name"]):
-            self.find_element(locators["rhci.satellite_name"]).send_keys(sat_name)
-            self.find_element(locators["rhci.satellite_description"]).send_keys(sat_desc)
-            self.wait_until_element(locators["rhci.next"]).click()
+            self.text_field_update(locators["rhci.satellite_name"], sat_name)
+            self.text_field_update(locators["rhci.satellite_description"], sat_desc)
         # RHCI: Configure organization page
         # TODO: Add ability to add new deploy org once the feature is available
         # if self.wait_until_element(locators["rhci.deployment_org"]):
         #    self.find_element(locators["rhci.deployment_org"]).click()
-        self.wait_until_element(locators["rhci.next"]).click()
+        self.click(locators["rhci.next"])
+
         # RHCI: Lifecycle environment page
         if use_default_org_view:
-            self.wait_until_element(locators["rhci.use_default_org_view"]).click()
-            # weird trashing happens here that breaks waiting for the next button
-            # unfortunately, the best I have right now to fix it is a sleep
-            sleep(3)
-            self.wait_until_element(locators["rhci.next"]).click()
-        elif self.wait_until_element((locators["rhci.env_path"][0],
-                                    locators["rhci.env_path"][1] % env_path)):
-            self.find_element((locators["rhci.env_path"][0],
-                               locators["rhci.env_path"][1] % env_path)).click()
-            self.wait_until_element(locators["rhci.next"]).click()
+            self.click(locators["rhci.next"])
+            self.click(locators["rhci.use_default_org_view"])
+            self.click(locators["rhci.next"])
+        elif self.wait_until_element(env_path_loc):
+            self.click(env_path_loc)
+            self.click(locators["rhci.next"])
         else:
             print "Can't find env_path: %s" % env_path
+
         # RHCI: RHEV Setup Type page.
-        if self.wait_until_element((locators["rhci.rhev_setup_type"][0],
-                                    locators["rhci.rhev_setup_type"][1] % rhev_setup_type)):
-            self.wait_until_element((locators["rhci.rhev_setup_type"][0],
-                                    locators["rhci.rhev_setup_type"][1] % rhev_setup_type)).click()
-            self.wait_until_element(locators["rhci.next"]).click()
+        if self.wait_until_element(rhev_setup_loc):
+            self.click(rhev_setup_loc)
+            self.click(locators["rhci.next"])
         else:
             print "Can't find locator for rhev_setup_type: %s" % rhev_setup_type
+
         # RHCI: RHEV Engine selection page.
-        if self.wait_until_element((locators["rhci.engine_mac_radio"][0],
-                                    locators["rhci.engine_mac_radio"][1] % rhevm_mac)):
-            self.find_element((locators["rhci.engine_mac_radio"][0],
-                               locators["rhci.engine_mac_radio"][1] % rhevm_mac)).click()
-            self.wait_until_element(locators["rhci.next"]).click()
+        self.click(rhevm_mac_loc)
+        self.click(locators["rhci.next"])
+
         # RHCI: RHEV Hypervisor selection page.
-        for mac_address in rhevh_macs:
-            if self.wait_until_element((locators["rhci.hypervisor_mac_check"][0],
-                                        locators["rhci.hypervisor_mac_check"][1] % mac_address)):
-                self.find_element((locators["rhci.hypervisor_mac_check"][0],
-                                   locators["rhci.hypervisor_mac_check"][1] % mac_address)).click()
-        self.wait_until_element(locators["rhci.next"]).click()
+        for rhevh_mac_loc in rhevh_mac_locs:
+            self.click(rhevh_mac_loc)
+        self.click(locators["rhci.next"])
+
         # RHCI: RHEV Configuration page.
         if self.wait_until_element(locators["rhci.rhev_root_pass"]):
-            self.find_element(locators["rhci.rhev_root_pass"]).send_keys(rhevm_adminpass)
-            self.find_element(locators["rhci.rhevm_adminpass"]).send_keys(rhevm_adminpass)
+            self.text_field_update(locators["rhci.rhev_root_pass"], rhevm_adminpass)
+            self.text_field_update(locators["rhci.rhevm_adminpass"], rhevm_adminpass)
             if datacenter_name is not None:
-                self.find_element(locators["rhci.datacenter_name"]).send_keys(datacenter_name)
+                self.text_field_update(locators["rhci.datacenter_name"], datacenter_name)
             if cluster_name is not None:
-                self.find_element(locators["rhci.cluster_name"]).send_keys(cluster_name)
+                self.text_field_update(locators["rhci.cluster_name"], cluster_name)
             if cpu_type is not None:
-                self.find_element(locators["rhci.cpu_type"]).send_keys(cpu_type)
-        self.wait_until_element(locators["rhci.next"]).click()
+                self.text_field_update(locators["rhci.cpu_type"], cpu_type)
+        self.click(locators["rhci.next"])
+
         # RHCI: RHEV Storage page.
         if self.wait_until_element(locators["rhci.data_domain_name"]):
             # XXX name fields aren't cleared before typing :(
-            self.find_element(locators["rhci.data_domain_name"]).send_keys(data_domain_name)
-            self.find_element(locators["rhci.data_domain_address"]).send_keys(data_domain_address)
-            self.find_element(locators["rhci.data_domain_share_path"]).send_keys(data_domain_share_path)
-            self.find_element(locators["rhci.export_domain_name"]).send_keys(export_domain_name)
-            self.find_element(locators["rhci.export_domain_address"]).send_keys(export_domain_address)
-            self.find_element(locators["rhci.export_domain_share_path"]).send_keys(export_domain_share_path)
-            self.wait_until_element(locators["rhci.next"]).click()
+            self.text_field_update(locators["rhci.data_domain_name"], data_domain_name)
+            self.text_field_update(locators["rhci.data_domain_address"], data_domain_address)
+            self.text_field_update(locators["rhci.data_domain_share_path"], data_domain_share_path)
+            self.text_field_update(locators["rhci.export_domain_name"], export_domain_name)
+            self.text_field_update(locators["rhci.export_domain_address"], export_domain_address)
+            self.text_field_update(locators["rhci.export_domain_share_path"],
+                export_domain_share_path)
+            self.click(locators["rhci.next"])
+
         # RHCI: Cloudforms configuration page.
-        if self.wait_until_element((locators['rhci.cfme_install_on'][0],
-                                    locators['rhci.cfme_install_on'][1] % cfme_install_loc)):
-            self.find_element((locators['rhci.cfme_install_on'][0],
-                               locators['rhci.cfme_install_on'][1] % cfme_install_loc)).click()
-        self.wait_until_element(locators['rhci.next']).click()
-        self.wait_until_element(locators['rhci.cfme_root_password']).send_keys(cfme_root_password)
-        self.wait_until_element(locators['rhci.cfme_admin_password']).send_keys(cfme_admin_password)
-        self.wait_until_element(locators['rhci.next']).click()
+        if self.wait_until_element(cfme_install_locator):
+            self.click(cfme_install_locator)
+        self.click(locators['rhci.next'])
+
+        self.wait_until_element(locators['rhci.cfme_root_password'])
+        self.text_field_update(locators['rhci.cfme_root_password'], cfme_root_password)
+        self.text_field_update(locators['rhci.cfme_admin_password'], cfme_admin_password)
+        self.click(locators["rhci.next"])
+
         # RHCI: Subscription Credentials page.
         if self.wait_until_element(locators['rhci.rhsm_username']):
-            self.find_element(locators['rhci.rhsm_username']).send_keys(rhsm_username)
-            self.find_element(locators['rhci.rhsm_password']).send_keys(rhsm_password)
-        self.wait_until_element(locators["rhci.next"]).click()
+            self.text_field_update(locators['rhci.rhsm_username'], rhsm_username)
+            self.text_field_update(locators['rhci.rhsm_password'], rhsm_password)
+        self.click(locators["rhci.next"])
+
         # RHCI: Subscription Management Application.
-        self.wait_until_element((locators["rhci.rhsm_satellite_radio"][0],
-                                 locators["rhci.rhsm_satellite_radio"][1] % rhsm_satellite_uuid)).click()
-        self.wait_until_element(locators["rhci.next"]).click()
+        self.wait_until_element(rhsm_sat_radio_loc)
+        self.click(rhsm_sat_radio_loc)
+        self.click(locators["rhci.next"])
+
         # RHCI: Select Subscriptions
-        for sub in rhsm_subs:
-            if self.wait_until_element((locators["rhci.subscription_check"][0],
-                                        locators["rhci.subscription_check"][1] % sub)):
-                self.wait_until_element((locators["rhci.subscription_check"][0],
-                                         locators["rhci.subscription_check"][1] % sub)).click()
-        self.wait_until_element(locators["rhci.next"]).click()
+        for sub_check_loc in sub_check_locs:
+            if self.wait_until_element(sub_check_loc):
+                self.click(sub_check_loc)
+        self.click(locators["rhci.next"])
+
         # RCHI: Review Installation page.
-        self.wait_until_element(locators["rhci.deploy"]).click()
+        # self.click(locators["rhci.deploy"])
+        # Wait a *long time* for the deployment to complete
