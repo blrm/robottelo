@@ -134,5 +134,5 @@ class RHCI(Base):
         self.click(locators["rhci.next"])
 
         # RCHI: Review Installation page.
-        # self.click(locators["rhci.deploy"])
+        self.click(locators["rhci.deploy"])
         # Wait a *long time* for the deployment to complete
