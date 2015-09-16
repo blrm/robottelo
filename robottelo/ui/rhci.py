@@ -72,6 +72,7 @@ class RHCI(Base):
             self.click(locators["rhci.next"])
         else:
             print "Can't find locator for rhev_setup_type: %s" % rhev_setup_type
+            self.click(locators["rhci.next"])
 
         # RHCI: RHEV Engine selection page.
         self.click(rhevm_mac_loc)
