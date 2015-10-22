@@ -4,6 +4,7 @@
 """
 Implements RHCI UI
 """
+from time import sleep
 from robottelo.ui.base import Base
 from robottelo.ui.locators import locators
 
@@ -97,7 +98,6 @@ class RHCI(Base):
 
         # RHCI: RHEV Storage page.
         if self.wait_until_element(locators["rhci.data_domain_name"]):
-            # XXX name fields aren't cleared before typing :(
             self.text_field_update(locators["rhci.data_domain_name"], data_domain_name)
             self.text_field_update(locators["rhci.data_domain_address"], data_domain_address)
             self.text_field_update(locators["rhci.data_domain_share_path"], data_domain_share_path)
@@ -135,5 +135,16 @@ class RHCI(Base):
         self.click(locators["rhci.next"])
 
         # RCHI: Review Installation page.
-        self.click(locators["rhci.deploy"])
+        self.click(locators["rhci.deploy"], timeout=300)
         # Wait a *long time* for the deployment to complete
+        # Sleep for a minute, then try to click the next button,
+        # for roughly two hours
+        for __ in range(120):
+            sleep(60)
+            try:
+                self.click(locators["rhci.next"])
+                break
+            except:
+                self.browser.refresh()
+        else:
+            raise Exception('Next button never became available to click')
