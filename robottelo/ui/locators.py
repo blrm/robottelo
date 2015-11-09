@@ -1936,6 +1936,10 @@ locators = LocatorDict({
     # RHCI
     "rhci.new": (
         By.XPATH, "//a[contains(.,'New Deployment')]"),
+    "rhci.product_select": (
+        By.XPATH, "//span[contains(@id,'%s')]/div[contains(@class, 'rhci-footer-unselected')]"),
+    "rhci.product_deselect": (
+        By.XPATH, "//span[contains(@id,'%s')]/div[contains(@class, 'rhci-footer-selected')]"),
     "rhci.next": (
         By.XPATH, "(//a|//button)[contains(.,'Next') and contains(@class, 'btn-primary') and not(contains(@class, 'disabled'))]"),
     "rhci.select": (
@@ -1950,6 +1954,20 @@ locators = LocatorDict({
         By.XPATH, "//input[@name='useDefaultOrgViewForEnv']"),
     "rhci.env_path": (
         By.XPATH, "//div[@class='path-selector']//span[contains(.,'%s')]"),
+    "rhci.undercloud_ip": (By.XPATH, "//label[contains(.,'Undercloud IP')]/../div/input"),
+    "rhci.undercloud_ssh_user": (By.XPATH, "//label[contains(.,'SSH User')]/../div/input"),
+    "rhci.undercloud_ssh_pass": (By.XPATH, "//label[contains(.,'SSH Password')]/../div/input"),
+    "rhci.detect_undercloud": (By.XPATH, "//button[contains(.,'Detect Undercloud')]"),
+    "rhci.register_nodes": (By.XPATH, "//button[contains(.,'Register Nodes')]"),
+    "rhci.node_driver_select":  (By.XPATH, "//label/label[contains(.,'Driver')]/../../div/select"),
+    "rhci.node_driver_dropdown_item": (By.XPATH, "//div/select/option[contains(@value, '%s')]"),
+    "rhci.node_ip_address": (By.XPATH, "//label/label[contains(.,'IP Address')]/../../div/input"),
+    "rhci.node_ipmi_user": (By.XPATH, "//label/label[contains(.,'IPMI User')]/../../div/input"),
+    "rhci.node_ipmi_pass": (By.XPATH, "//label/label[contains(.,'IPMI Password')]/../../div/input"),
+    "rhci.node_nic_mac_address": (By.XPATH, "//label/label[contains(.,'NIC MAC Address')]/../../div/textarea"),
+    "rhci.node_register_nodes": (
+        By.XPATH, "//div[contains(@class, 'modal-footer')]/button[contains(.,'Register Nodes')]"),
+    "rhci.node_add_node": (By.XPATH, "//a[contains(@class,'nodes-add-button') and contains(@title, 'Add node')]"),
     "rhci.rhev_setup_type": (
         By.XPATH, "//input[@value='%s']"),
     "rhci.hypervisor_mac_check": (

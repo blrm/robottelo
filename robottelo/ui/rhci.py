@@ -22,14 +22,16 @@ class RHCI(Base):
     Implements functions for RHCI deployments
     """
 
-    def create(self, sat_name, sat_desc, deploy_org, env_path, rhevh_macs, rhevm_mac,
+    def create(self, sat_name, sat_desc, products, deploy_org, env_path, overcloud_nodes,
+               rhevh_macs, rhevm_mac, undercloud_user, undercloud_pass,
                rhevh_hostname, rhevm_hostname, rhevm_adminpass, rhsm_username, rhsm_password,
                rhsm_satellite_uuid, rhsm_subs, rhev_setup_type, use_default_org_view=False,
                datacenter_name=None, cluster_name=None, cpu_type=None, storage_type=None,
                data_domain_name=None, export_domain_name=None, data_domain_address=None,
                export_domain_address=None, data_domain_share_path=None,
                export_domain_share_path=None, cfme_install_loc=None,
-               cfme_root_password=None, cfme_admin_password=None):
+               cfme_root_password=None, cfme_admin_password=None, undercloud_address=None,
+               ):
         """
         Creates a new RHCI deployment with the provided details.
         """
@@ -43,9 +45,46 @@ class RHCI(Base):
         rhsm_sat_radio_loc = interp_loc('rhci.rhsm_satellite_radio', rhsm_satellite_uuid)
         sub_check_locs = [interp_loc('rhci.subscription_check', sub) for sub in rhsm_subs]
 
+        self._page_software_selection(products)
+
+        self._page_satellite_configuration(sat_name, sat_desc)
+        self._page_lifecycle_environment(env_path_loc, env_path, use_default_org_view)
+
+        # RHCI: Openstack Configuration
+        if "openstack" in products:
+            self._page_discover_undercloud(undercloud_address, undercloud_user, undercloud_pass)
+            self._page_register_nodes(overcloud_nodes)
+            self._page_assign_nodes()
+
+        # RHCI: RHEV Setup Type page.
+        if "rhev" in products:
+            self._page_rhev_setup_type(rhev_setup_loc, rhev_setup_type)
+            self._page_rhev_engine_selection(rhevm_mac_loc)
+            self._page_rhev_hypervisor_selection(rhevh_mac_locs)
+            self._page_rhev_configuration(rhevm_adminpass, datacenter_name, cluster_name, cpu_type)
+            self._page_rhev_storage_configuration(data_domain_name, data_domain_address, data_domain_share_path,
+                                         export_domain_name, export_domain_address, export_domain_share_path)
+
+        if "cloudforms" in products:
+            self._page_cloudforms_configuration(cfme_install_locator, cfme_root_password, cfme_admin_password)
+
+        self._page_redhat_login(rhsm_username, rhsm_password)
+        self._page_subscription_manager_apps(rhsm_sat_radio_loc)
+        self._page_select_subscriptions(sub_check_locs)
+        self._page_review_deployment()
+
+
+
+    def _page_software_selection(self, products):
         # RHCI: software selection page
+        # Deselect everything
+        self.click(interp_loc('rhci.product_deselect', 'rhev'))
+        # Select products to install
+        for prod in products:
+            self.click(interp_loc('rhci.product_select', prod))
         self.click(locators["rhci.select"])
 
+    def _page_satellite_configuration(self, sat_name, sat_desc):
         # RHCI: Satellite Configuration
         if self.wait_until_element(locators["rhci.satellite_name"]):
             self.text_field_update(locators["rhci.satellite_name"], sat_name)
@@ -56,6 +95,7 @@ class RHCI(Base):
         #    self.find_element(locators["rhci.deployment_org"]).click()
         self.click(locators["rhci.next"])
 
+    def _page_lifecycle_environment(self, env_path_loc, env_path, use_default_org_view):
         # RHCI: Lifecycle environment page
         if use_default_org_view:
             self.click(locators["rhci.next"])
@@ -67,7 +107,36 @@ class RHCI(Base):
         else:
             print "Can't find env_path: %s" % env_path
 
-        # RHCI: RHEV Setup Type page.
+    def _page_discover_undercloud(self, undercloud_address, undercloud_user, undercloud_pass):
+        # RHCI: Detect Undercloud page.
+        self.text_field_update(locators['rhci.undercloud_ip'], undercloud_address)
+        self.text_field_update(locators['rhci.undercloud_ssh_user'], undercloud_user)
+        self.text_field_update(locators['rhci.undercloud_ssh_pass'], undercloud_pass)
+        self.click(locators['rhci.detect_undercloud'])
+        self.click(locators['rhci.next'])
+
+    def _page_register_nodes(self, overcloud_nodes):
+        # RHCI: Register Nodes
+        self.click(locators['rhci.register_nodes'])
+        for node_num, node in enumerate(overcloud_nodes):
+            if node_num > 0:
+                self.click(locators['rhci.node_add_node'])
+            self.click(locators['rhci.node_driver_select'])
+            self.click(interp_loc('rhci.node_driver_dropdown_item', node['driver']))
+            self.text_field_update(locators['rhci.node_ip_address'], node['ip_address'])
+            self.text_field_update(locators['rhci.node_ipmi_user'], node['username'])
+            self.text_field_update(locators['rhci.node_ipmi_pass'], node['password'])
+            self.text_field_update(locators['rhci.node_nic_mac_address'], node['mac_address'])
+        self.click(locators['node_register_nodes'])
+        self.wait_until_element_is_clickable(locators['rhci.next'],timeout=30)
+        self.click(locators['rhci.next'])
+
+    def _page_assign_nodes(self):
+        # RHCI: Assign Nodes
+        #Assign some roles here once nodes are registered
+        self.click(locators['rhci.next'])
+
+    def _page_rhev_setup_type(self, rhev_setup_loc, rhev_setup_type):
         if self.wait_until_element(rhev_setup_loc):
             self.click(rhev_setup_loc)
             self.click(locators["rhci.next"])
@@ -75,15 +144,18 @@ class RHCI(Base):
             print "Can't find locator for rhev_setup_type: %s" % rhev_setup_type
             self.click(locators["rhci.next"])
 
+    def _page_rhev_engine_selection(self, rhevm_mac_loc):
         # RHCI: RHEV Engine selection page.
         self.click(rhevm_mac_loc)
         self.click(locators["rhci.next"])
 
-        # RHCI: RHEV Hypervisor selection page.
+    def _page_rhev_hypervisor_selection(self, rhevh_mac_locs):
+        # RHCI: RHEV Hypervisor selection page.s(self,
         for rhevh_mac_loc in rhevh_mac_locs:
             self.click(rhevh_mac_loc)
         self.click(locators["rhci.next"])
 
+    def _page_rhev_configuration(self, rhevm_adminpass, datacenter_name, cluster_name, cpu_type):
         # RHCI: RHEV Configuration page.
         if self.wait_until_element(locators["rhci.rhev_root_pass"]):
             self.text_field_update(locators["rhci.rhev_root_pass"], rhevm_adminpass)
@@ -96,6 +168,8 @@ class RHCI(Base):
                 self.text_field_update(locators["rhci.cpu_type"], cpu_type)
         self.click(locators["rhci.next"])
 
+    def _page_rhev_storage_configuration(self, data_domain_name, data_domain_address, data_domain_share_path,
+                                         export_domain_name, export_domain_address, export_domain_share_path):
         # RHCI: RHEV Storage page.
         if self.wait_until_element(locators["rhci.data_domain_name"]):
             self.text_field_update(locators["rhci.data_domain_name"], data_domain_name)
@@ -107,6 +181,7 @@ class RHCI(Base):
                 export_domain_share_path)
             self.click(locators["rhci.next"])
 
+    def _page_cloudforms_configuration(self, cfme_install_locator, cfme_root_password, cfme_admin_password):
         # RHCI: Cloudforms configuration page.
         if self.wait_until_element(cfme_install_locator):
             self.click(cfme_install_locator)
@@ -117,23 +192,27 @@ class RHCI(Base):
         self.text_field_update(locators['rhci.cfme_admin_password'], cfme_admin_password)
         self.click(locators["rhci.next"])
 
+    def _page_redhat_login(self, rhsm_username, rhsm_password):
         # RHCI: Subscription Credentials page.
         if self.wait_until_element(locators['rhci.rhsm_username']):
             self.text_field_update(locators['rhci.rhsm_username'], rhsm_username)
             self.text_field_update(locators['rhci.rhsm_password'], rhsm_password)
         self.click(locators["rhci.next"])
 
+    def _page_subscription_manager_apps(self, rhsm_sat_radio_loc):
         # RHCI: Subscription Management Application.
         self.wait_until_element(rhsm_sat_radio_loc)
         self.click(rhsm_sat_radio_loc)
         self.click(locators["rhci.next"])
 
+    def _page_select_subscriptions(self, sub_check_locs):
         # RHCI: Select Subscriptions
         for sub_check_loc in sub_check_locs:
             if self.wait_until_element(sub_check_loc):
                 self.click(sub_check_loc)
         self.click(locators["rhci.next"])
 
+    def _page_review_deployment(self):
         # RCHI: Review Installation page.
         self.click(locators["rhci.deploy"], timeout=300)
         # Wait a *long time* for the deployment to complete
