@@ -1954,6 +1954,7 @@ locators = LocatorDict({
         By.XPATH, "//input[@name='useDefaultOrgViewForEnv']"),
     "rhci.env_path": (
         By.XPATH, "//div[@class='path-selector']//span[contains(.,'%s')]"),
+    "rhci.enable_access_insights": (By.XPATH, "//input[@name='enable_access_insights']"),
     "rhci.undercloud_ip": (By.XPATH, "//label[contains(.,'Undercloud IP')]/../div/input"),
     "rhci.undercloud_ssh_user": (By.XPATH, "//label[contains(.,'SSH User')]/../div/input"),
     "rhci.undercloud_ssh_pass": (By.XPATH, "//label[contains(.,'SSH Password')]/../div/input"),

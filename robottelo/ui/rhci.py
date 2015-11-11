@@ -26,6 +26,7 @@ class RHCI(Base):
                rhevh_macs, rhevm_mac, undercloud_user, undercloud_pass,
                rhevh_hostname, rhevm_hostname, rhevm_adminpass, rhsm_username, rhsm_password,
                rhsm_satellite_uuid, rhsm_subs, rhev_setup_type, use_default_org_view=False,
+               enable_access_insights=False,
                datacenter_name=None, cluster_name=None, cpu_type=None, storage_type=None,
                data_domain_name=None, export_domain_name=None, data_domain_address=None,
                export_domain_address=None, data_domain_share_path=None,
@@ -49,6 +50,7 @@ class RHCI(Base):
 
         self._page_satellite_configuration(sat_name, sat_desc)
         self._page_lifecycle_environment(env_path_loc, env_path, use_default_org_view)
+        self._page_access_insights(enable_access_insights)
 
         # RHCI: Openstack Configuration
         if "openstack" in products:
@@ -106,6 +108,12 @@ class RHCI(Base):
             self.click(locators["rhci.next"])
         else:
             print "Can't find env_path: %s" % env_path
+
+    def _page_access_insights(self, enable_access_insights):
+        # RHCI: Enable Access Insights page
+        if enable_access_insights:
+            self.click(locators["rhci.enable_access_insights"])
+        self.click(locators["rhci.next"])
 
     def _page_discover_undercloud(self, undercloud_address, undercloud_user, undercloud_pass):
         # RHCI: Detect Undercloud page.
