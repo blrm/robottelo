@@ -226,7 +226,7 @@ class RHCI(Base):
         # Wait a *long time* for the deployment to complete
         # Sleep for a minute, then try to click the next button,
         # for roughly two hours
-        for __ in range(180):
+        for __ in range(240):
             sleep(60)
             try:
                 self.click(locators["rhci.next"])
