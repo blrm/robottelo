@@ -45,12 +45,14 @@ class RHCI(Base):
         cfme_install_locator = interp_loc('rhci.cfme_install_on', cfme_install_loc)
         rhsm_sat_radio_loc = interp_loc('rhci.rhsm_satellite_radio', rhsm_satellite_uuid)
         sub_check_locs = [interp_loc('rhci.subscription_check', sub) for sub in rhsm_subs]
+        # TODO: get rid of this locator once we have actual version checking
+        rhai_present_locator = interp_loc('rhci.active_view', '1D. Access Insights')
 
         self._page_software_selection(products)
 
         self._page_satellite_configuration(sat_name, sat_desc)
         self._page_lifecycle_environment(env_path_loc, env_path, use_default_org_view)
-        self._page_access_insights(enable_access_insights)
+        self._page_access_insights(rhai_present_locator,enable_access_insights)
 
         # RHCI: Openstack Configuration
         if "openstack" in products:
@@ -109,11 +111,13 @@ class RHCI(Base):
         else:
             print "Can't find env_path: %s" % env_path
 
-    def _page_access_insights(self, enable_access_insights):
+    def _page_access_insights(self,rhai_present_locator, enable_access_insights):
         # RHCI: Enable Access Insights page
-        if enable_access_insights:
-            self.click(locators["rhci.enable_access_insights"])
-        self.click(locators["rhci.next"])
+        # TODO: replace this workaround once we have version checking.
+        if self.wait_until_element(rhai_present_locator):
+            if enable_access_insights:
+                self.click(locators["rhci.enable_access_insights"])
+            self.click(locators["rhci.next"])
 
     def _page_discover_undercloud(self, undercloud_address, undercloud_user, undercloud_pass):
         # RHCI: Detect Undercloud page.

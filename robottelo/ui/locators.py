@@ -1952,6 +1952,7 @@ locators = LocatorDict({
         By.XPATH, "//input[@name='deployment-organization']"),
     "rhci.use_default_org_view": (
         By.XPATH, "//input[@name='useDefaultOrgViewForEnv']"),
+    "rhci.active_view": (By.XPATH, "//div[contains(@class,'ember-view active')]/a[contains(.,'%s')]"),
     "rhci.env_path": (
         By.XPATH, "//div[@class='path-selector']//span[contains(.,'%s')]"),
     "rhci.enable_access_insights": (By.XPATH, "//input[@name='enable_access_insights']"),
