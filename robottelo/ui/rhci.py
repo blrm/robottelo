@@ -82,7 +82,7 @@ class RHCI(Base):
     def _page_software_selection(self, products):
         # RHCI: software selection page
         # Deselect everything
-        self.click(interp_loc('rhci.product_deselect', 'rhev'))
+        # self.click(interp_loc('rhci.product_deselect', 'rhev'))
         # Select products to install
         for prod in products:
             self.click(interp_loc('rhci.product_select', prod))
@@ -171,7 +171,11 @@ class RHCI(Base):
         # RHCI: RHEV Configuration page.
         if self.wait_until_element(locators["rhci.rhev_root_pass"]):
             self.text_field_update(locators["rhci.rhev_root_pass"], rhevm_adminpass)
+            if self.wait_until_element(locators["rhci.confirm_rhev_root_pass"],timeout=5):
+                self.text_field_update(locators["rhci.confirm_rhev_root_pass"], rhevm_adminpass)
             self.text_field_update(locators["rhci.rhevm_adminpass"], rhevm_adminpass)
+            if self.wait_until_element(locators["rhci.confirm_rhevm_adminpass"],timeout=5):
+                self.text_field_update(locators["rhci.confirm_rhevm_adminpass"], rhevm_adminpass)
             if datacenter_name is not None:
                 self.text_field_update(locators["rhci.datacenter_name"], datacenter_name)
             if cluster_name is not None:
@@ -201,7 +205,11 @@ class RHCI(Base):
 
         self.wait_until_element(locators['rhci.cfme_root_password'])
         self.text_field_update(locators['rhci.cfme_root_password'], cfme_root_password)
+        if self.wait_until_element(locators['rhci.confirm_cfme_root_password'],timeout=5):
+            self.text_field_update(locators['rhci.confirm_cfme_root_password'], cfme_root_password)
         self.text_field_update(locators['rhci.cfme_admin_password'], cfme_admin_password)
+        if self.wait_until_element(locators['rhci.confirm_cfme_admin_password'], timeout=5):
+            self.text_field_update(locators['rhci.confirm_cfme_admin_password'], cfme_admin_password)
         self.click(locators["rhci.next"])
 
     def _page_redhat_login(self, rhsm_username, rhsm_password):

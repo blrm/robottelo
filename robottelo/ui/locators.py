@@ -1989,9 +1989,13 @@ locators = LocatorDict({
     "rhci.engine_mac_radio": (
         By.XPATH, "//td[contains(.,'%s')]/../td/input"),
     "rhci.rhev_root_pass": (
-        By.XPATH, "//input[@id='rhev_root_password']"),
+        By.XPATH, "//input[@id='rhev_root_password' or @id='rhev-root-password']"),
+    "rhci.confirm_rhev_root_pass": (
+        By.XPATH, "//input[@id='confirm-rhev-root-password']"),
     "rhci.rhevm_adminpass": (
-        By.XPATH, "//input[@id='rhev_engine_admin_password']"),
+        By.XPATH, "//input[@id='rhev_engine_admin_password' or @id='rhev-engine-admin-password']"),
+    "rhci.confirm_rhevm_adminpass": (
+        By.XPATH, "//input[@id='confirm-rhev-engine-pdmin-password']"),
     # TODO: File BZ (datacenter != database)
     "rhci.datacenter_name": (
         By.XPATH, "//input[@id='rhev_database_name']"),
@@ -2026,8 +2030,12 @@ locators = LocatorDict({
         By.XPATH, "//input[@type='radio' and @value='%s']"),
     "rhci.cfme_admin_password": (
         By.XPATH, "//input[@id='cfme_admin_password']"),
+    "rhci.confirm_cfme_admin_password": (
+        By.XPATH, "//input[@id='confirm_cfme_admin_password']"),
     "rhci.cfme_root_password": (
         By.XPATH, "//input[@id='cfme_root_password']"),
+    "rhci.confirm_cfme_root_password": (
+        By.XPATH, "//input[@id='confirm_cfme_root_password']"),
     # TODO: File BZ, these rhsm inputs need IDs.
     "rhci.rhsm_username": (
         By.XPATH,
