@@ -191,10 +191,12 @@ class RHCI(Base):
             self.text_field_update(locators["rhci.data_domain_name"], data_domain_name)
             self.text_field_update(locators["rhci.data_domain_address"], data_domain_address)
             self.text_field_update(locators["rhci.data_domain_share_path"], data_domain_share_path)
-            self.text_field_update(locators["rhci.export_domain_name"], export_domain_name)
-            self.text_field_update(locators["rhci.export_domain_address"], export_domain_address)
-            self.text_field_update(locators["rhci.export_domain_share_path"],
-                export_domain_share_path)
+            # TODO: identify storage fields that should be present based on products being installed.
+            if self.wait_until_element(locators["rhci.export_domain_name"],timeout=5):
+                self.text_field_update(locators["rhci.export_domain_name"], export_domain_name)
+                self.text_field_update(locators["rhci.export_domain_address"], export_domain_address)
+                self.text_field_update(locators["rhci.export_domain_share_path"],
+                    export_domain_share_path)
             self.click(locators["rhci.next"])
 
     def _page_cloudforms_configuration(self, cfme_install_locator, cfme_root_password, cfme_admin_password):
@@ -237,7 +239,7 @@ class RHCI(Base):
         self.click(locators["rhci.deploy"], timeout=300)
         # Wait a *long time* for the deployment to complete
         # Sleep for a minute, then try to click the next button,
-        # for roughly two hours
+        # for roughly four hours
         for __ in range(240):
             sleep(60)
             try:
