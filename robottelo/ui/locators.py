@@ -2004,10 +2004,10 @@ locators = LocatorDict({
     "rhci.cpu_type": (
         By.XPATH,
         ("//div[@class='form-group']/label[contains(.,'CPU Type')]"
-        "/following-sibling::div/input")),
+         "/following-sibling::div/input")),
     "rhci.storage_type": (
         By.XPATH,
-        ("//input[@type='radio' and contains(@value, '%s')]")),
+        "//input[@type='radio' and contains(@value, '%s')]"),
     "rhci.data_domain_name": (
         By.XPATH, "//input[@id='rhev_storage_name']"),
     "rhci.export_domain_name": (

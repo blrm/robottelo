@@ -41,6 +41,7 @@ class RHCI(Base):
         rhev_setup_loc = interp_loc('rhci.rhev_setup_type', rhev_setup_type)
         rhevm_mac_loc = interp_loc('rhci.engine_mac_radio', rhevm_mac)
         rhevh_mac_locs = [interp_loc('rhci.hypervisor_mac_check', mac) for mac in rhevh_macs]
+        rhev_storage_type_loc = interp_loc('rhci.storage_type', storage_type)
         # cfme_install_loc is a kwargs, apologies for the potential confusion
         cfme_install_locator = interp_loc('rhci.cfme_install_on', cfme_install_loc)
         rhsm_sat_radio_loc = interp_loc('rhci.rhsm_satellite_radio', rhsm_satellite_uuid)
@@ -67,7 +68,8 @@ class RHCI(Base):
             self._page_rhev_hypervisor_selection(rhevh_mac_locs)
             self._page_rhev_configuration(rhevm_adminpass, datacenter_name, cluster_name, cpu_type)
             self._page_rhev_storage_configuration(data_domain_name, data_domain_address, data_domain_share_path,
-                                         export_domain_name, export_domain_address, export_domain_share_path)
+                                                  export_domain_name, export_domain_address, export_domain_share_path,
+                                                  rhev_storage_type_loc)
 
         if "cloudforms" in products:
             self._page_cloudforms_configuration(cfme_install_locator, cfme_root_password, cfme_admin_password)
@@ -76,8 +78,6 @@ class RHCI(Base):
         self._page_subscription_manager_apps(rhsm_sat_radio_loc)
         self._page_select_subscriptions(sub_check_locs)
         self._page_review_deployment()
-
-
 
     def _page_software_selection(self, products):
         # RHCI: software selection page
@@ -185,8 +185,11 @@ class RHCI(Base):
         self.click(locators["rhci.next"])
 
     def _page_rhev_storage_configuration(self, data_domain_name, data_domain_address, data_domain_share_path,
-                                         export_domain_name, export_domain_address, export_domain_share_path):
+                                         export_domain_name, export_domain_address, export_domain_share_path,
+                                         rhev_storage_type_loc):
         # RHCI: RHEV Storage page.
+        if self.wait_until_element(rhev_storage_type_loc):
+            self.click(rhev_storage_type_loc)
         if self.wait_until_element(locators["rhci.data_domain_name"]):
             self.text_field_update(locators["rhci.data_domain_name"], data_domain_name)
             self.text_field_update(locators["rhci.data_domain_address"], data_domain_address)
