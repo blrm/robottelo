@@ -23,7 +23,7 @@ class RHCI(Base):
     """
 
     def create(self, sat_name, sat_desc, products, deploy_org, env_path, overcloud_nodes,
-               rhevh_macs, rhevm_mac, undercloud_user, undercloud_pass,
+               rhevh_macs, rhevm_mac, undercloud_user, undercloud_pass, update_lifecycle,
                rhevh_hostname, rhevm_hostname, rhevm_adminpass, rhsm_username, rhsm_password,
                rhsm_satellite_uuid, rhsm_subs, rhev_setup_type, use_default_org_view=False,
                enable_access_insights=False,
@@ -52,7 +52,7 @@ class RHCI(Base):
         self._page_software_selection(products)
 
         self._page_satellite_configuration(sat_name, sat_desc)
-        self._page_lifecycle_environment(env_path_loc, env_path, use_default_org_view)
+        self._page_lifecycle_environment(env_path_loc, env_path, update_lifecycle)
         self._page_access_insights(rhai_present_locator,enable_access_insights)
 
         # RHCI: Openstack Configuration
@@ -77,6 +77,7 @@ class RHCI(Base):
         self._page_redhat_login(rhsm_username, rhsm_password)
         self._page_subscription_manager_apps(rhsm_sat_radio_loc)
         self._page_select_subscriptions(sub_check_locs)
+        self._page_review_subscriptions()
         self._page_review_deployment()
 
     def _page_software_selection(self, products):
@@ -93,31 +94,27 @@ class RHCI(Base):
         if self.wait_until_element(locators["rhci.satellite_name"]):
             self.text_field_update(locators["rhci.satellite_name"], sat_name)
             self.text_field_update(locators["rhci.satellite_description"], sat_desc)
+        self.click(locators["rhci.next"])
         # RHCI: Configure organization page
         # TODO: Add ability to add new deploy org once the feature is available
         # if self.wait_until_element(locators["rhci.deployment_org"]):
         #    self.find_element(locators["rhci.deployment_org"]).click()
         self.click(locators["rhci.next"])
 
-    def _page_lifecycle_environment(self, env_path_loc, env_path, use_default_org_view):
+    def _page_lifecycle_environment(self, env_path_loc, env_path, update_lifecycle):
         # RHCI: Lifecycle environment page
-        if use_default_org_view:
-            self.click(locators["rhci.next"])
-            self.click(locators["rhci.use_default_org_view"])
-            self.click(locators["rhci.next"])
-        elif self.wait_until_element(env_path_loc):
-            self.click(env_path_loc)
-            self.click(locators["rhci.next"])
-        else:
-            print "Can't find env_path: %s" % env_path
+        self.click(interp_loc('rhci.update_lifecycle_select', update_lifecycle))
+        # if env_path:
+        #     self.click(env_path_loc)
+        self.click(locators["rhci.next"])
 
-    def _page_access_insights(self,rhai_present_locator, enable_access_insights):
+    def _page_access_insights(self, rhai_present_locator, enable_access_insights):
         # RHCI: Enable Access Insights page
         # TODO: replace this workaround once we have version checking.
-        if self.wait_until_element(rhai_present_locator):
-            if enable_access_insights:
-                self.click(locators["rhci.enable_access_insights"])
-            self.click(locators["rhci.next"])
+        # if self.wait_until_element(rhai_present_locator):
+        if enable_access_insights:
+            self.click(locators["rhci.enable_access_insights"])
+        self.click(locators["rhci.next"])
 
     def _page_discover_undercloud(self, undercloud_address, undercloud_user, undercloud_pass):
         # RHCI: Detect Undercloud page.
@@ -145,7 +142,7 @@ class RHCI(Base):
 
     def _page_assign_nodes(self):
         # RHCI: Assign Nodes
-        #Assign some roles here once nodes are registered
+        # Assign some roles here once nodes are registered
         self.click(locators['rhci.next'])
 
     def _page_rhev_setup_type(self, rhev_setup_loc, rhev_setup_type):
@@ -235,6 +232,10 @@ class RHCI(Base):
         for sub_check_loc in sub_check_locs:
             if self.wait_until_element(sub_check_loc):
                 self.click(sub_check_loc)
+        self.click(locators["rhci.next"])
+
+    def _page_review_subscriptions(self):
+        # RHCI: Review Subscriptions
         self.click(locators["rhci.next"])
 
     def _page_review_deployment(self):
