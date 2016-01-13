@@ -257,6 +257,8 @@ class RHCI(Base):
                         self.browser.refresh()
                         success = True
                     except:
+                        # wait a few seconds before trying again.
+                        sleep(5)
                         attempts += 1
         else:
             raise Exception('Next button never became available to click')
