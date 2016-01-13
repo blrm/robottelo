@@ -245,11 +245,18 @@ class RHCI(Base):
         # Sleep for a minute, then try to click the next button,
         # for roughly four hours
         for __ in range(240):
-            sleep(60)
+            sleep(90)
             try:
                 self.click(locators["rhci.next"])
                 break
             except:
-                self.browser.refresh()
+                success = False
+                attempts = 0
+                while attempts < 3 and not success:
+                    try:
+                        self.browser.refresh()
+                        success = True
+                    except:
+                        attempts += 1
         else:
             raise Exception('Next button never became available to click')
