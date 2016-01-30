@@ -252,13 +252,13 @@ class RHCI(Base):
             except:
                 success = False
                 attempts = 0
-                while attempts < 3 and not success:
+                while attempts < 40 and not success:
                     try:
                         self.browser.refresh()
                         success = True
                     except:
                         # wait a few seconds before trying again.
-                        sleep(5)
+                        sleep(15)
                         attempts += 1
         else:
             raise Exception('Next button never became available to click')
