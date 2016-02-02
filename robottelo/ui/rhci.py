@@ -249,14 +249,16 @@ class RHCI(Base):
             try:
                 self.click(locators["rhci.next"])
                 break
-            except:
+            except Exception as e:
+                print "DEBUG: CLICK_NEXT LOOP - {}".format(e)
                 success = False
                 attempts = 0
                 while attempts < 3 and not success:
                     try:
                         self.browser.refresh()
                         success = True
-                    except:
+                    except Exception as refresh_exception:
+                        print "DEBUG: REFRESH LOOP - {}".format(refresh_exception)
                         # wait a few seconds before trying again.
                         sleep(5)
                         attempts += 1
