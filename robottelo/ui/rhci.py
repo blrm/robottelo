@@ -253,14 +253,14 @@ class RHCI(Base):
                 print "DEBUG: CLICK_NEXT LOOP - {}".format(e)
                 success = False
                 attempts = 0
-                while attempts < 3 and not success:
+                while attempts < 40 and not success:
                     try:
                         self.browser.refresh()
                         success = True
                     except Exception as refresh_exception:
                         print "DEBUG: REFRESH LOOP - {}".format(refresh_exception)
                         # wait a few seconds before trying again.
-                        sleep(5)
+                        sleep(15)
                         attempts += 1
         else:
             raise Exception('Next button never became available to click')
