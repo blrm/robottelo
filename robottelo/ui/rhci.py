@@ -7,6 +7,9 @@ Implements RHCI UI
 from time import sleep
 from robottelo.ui.base import Base
 from robottelo.ui.locators import locators
+from robottelo.common.helpers import get_server_url
+import requests
+import socket, errno
 
 
 def interp_loc(locator_name, interpolate_string):
@@ -242,25 +245,27 @@ class RHCI(Base):
         # RCHI: Review Installation page.
         self.click(locators["rhci.deploy"], timeout=300)
         # Wait a *long time* for the deployment to complete
-        # Sleep for a minute, then try to click the next button,
-        # for roughly four hours
-        for __ in range(240):
-            sleep(90)
-            try:
+        # Sleep for five minutes, then check if the next button is available to click
+        for __ in range(48):
+            sleep(60)  # wait for 5 minutes
+            if self.is_element_visible(locators["rhci.next"]):
                 self.click(locators["rhci.next"])
                 break
-            except Exception as e:
-                print "DEBUG: CLICK_NEXT LOOP - {}".format(e)
+            else:
                 success = False
                 attempts = 0
-                while attempts < 40 and not success:
+                while attempts < 5 and not success:
                     try:
-                        self.browser.refresh()
-                        success = True
-                    except Exception as refresh_exception:
-                        print "DEBUG: REFRESH LOOP - {}".format(refresh_exception)
-                        # wait a few seconds before trying again.
-                        sleep(15)
-                        attempts += 1
+                        r = requests.get(get_server_url(), verify=False, timeout=10)
+                        if r.status_code == 200:
+                            print "request returned http 200!"
+                            success = True
+                    except socket.error as e:
+                        if e.errno == errno.ECONNREFUSED:
+                            sleep(30)  # wait for 30 seconds before re-checking
+                            attempts += 1
+                        else:
+                            raise
+                self.browser.refresh()
         else:
             raise Exception('Next button never became available to click')
