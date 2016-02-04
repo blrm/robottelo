@@ -246,8 +246,8 @@ class RHCI(Base):
         self.click(locators["rhci.deploy"], timeout=300)
         # Wait a *long time* for the deployment to complete
         # Sleep for five minutes, then check if the next button is available to click
-        for __ in range(48):
-            sleep(60)  # wait for 5 minutes
+        for __ in range(60):
+            sleep(360)  # wait for 5 minutes
             if self.is_element_visible(locators["rhci.next"]):
                 self.click(locators["rhci.next"])
                 break
