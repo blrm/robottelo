@@ -242,30 +242,34 @@ class RHCI(Base):
         self.click(locators["rhci.next"])
 
     def _page_review_deployment(self):
-        # RCHI: Review Installation page.
+        def wait_for_server_connection():
+            success = False
+            attempts = 0
+            while attempts < 5 and not success:
+                try:
+                    r = requests.get(get_server_url(), verify=False, timeout=10)
+                    if r.status_code == 200:
+                        success = True
+                except socket.error as e:
+                    if e.errno == errno.ECONNREFUSED:
+                        print "Attempt {} - connection refused! waiting 30s to retry...".format(attempts)
+                        sleep(30)  # wait for 30 seconds before re-checking
+                        attempts += 1
+                    else:
+                        raise
+
+        # RHCI: Review Installation page.
         self.click(locators["rhci.deploy"], timeout=300)
         # Wait a *long time* for the deployment to complete
         # Sleep for five minutes, then check if the next button is available to click
         for __ in range(60):
             sleep(360)  # wait for 5 minutes
+            wait_for_server_connection()
             if self.is_element_visible(locators["rhci.next"]):
                 self.click(locators["rhci.next"])
                 break
             else:
-                success = False
-                attempts = 0
-                while attempts < 5 and not success:
-                    try:
-                        r = requests.get(get_server_url(), verify=False, timeout=10)
-                        if r.status_code == 200:
-                            print "request returned http 200!"
-                            success = True
-                    except socket.error as e:
-                        if e.errno == errno.ECONNREFUSED:
-                            sleep(30)  # wait for 30 seconds before re-checking
-                            attempts += 1
-                        else:
-                            raise
+                wait_for_server_connection()
                 self.browser.refresh()
         else:
             raise Exception('Next button never became available to click')
