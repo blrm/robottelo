@@ -139,7 +139,7 @@ class RHCI(Base):
             self.text_field_update(locators['rhci.node_ipmi_user'], node['username'])
             self.text_field_update(locators['rhci.node_ipmi_pass'], node['password'])
             self.text_field_update(locators['rhci.node_nic_mac_address'], node['mac_address'])
-        self.click(locators['node_register_nodes'])
+        self.click(locators['rhci.node_register_nodes'])
         self.wait_until_element_is_clickable(locators['rhci.next'],timeout=30)
         self.click(locators['rhci.next'])
 
