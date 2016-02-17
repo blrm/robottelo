@@ -37,7 +37,8 @@ class RHCI(Base):
                cfme_root_password=None, cfme_admin_password=None, undercloud_address=None,
                overcloud_external_nic=None, overcloud_prov_network=None,
                overcloud_pub_network=None, overcloud_pub_gateway=None, overcloud_admin_pass=None,
-               ):
+               disconnected_url=None, disconnected_manifest=None):
+
         """
         Creates a new RHCI deployment with the provided details.
         """
@@ -82,9 +83,12 @@ class RHCI(Base):
         if "cloudforms" in products:
             self._page_cloudforms_configuration(cfme_install_locator, cfme_root_password, cfme_admin_password)
 
-        self._page_redhat_login(rhsm_username, rhsm_password)
-        self._page_subscription_manager_apps(rhsm_sat_radio_loc)
-        self._page_select_subscriptions(sub_check_locs)
+        if disconnected_url:
+            self._page_disconnected(disconnected_url, disconnected_manifest)
+        else:
+            self._page_redhat_login(rhsm_username, rhsm_password)
+            self._page_subscription_manager_apps(rhsm_sat_radio_loc)
+            self._page_select_subscriptions(sub_check_locs)
         self._page_review_subscriptions()
         self._page_review_deployment()
 
@@ -275,6 +279,18 @@ class RHCI(Base):
         if self.wait_until_element(locators['rhci.rhsm_username']):
             self.text_field_update(locators['rhci.rhsm_username'], rhsm_username)
             self.text_field_update(locators['rhci.rhsm_password'], rhsm_password)
+        self.click(locators["rhci.next"])
+
+    def _page_disconnected(self, disconnected_url, disconnected_manifest):
+        if self.wait_until_element(locators['rhci.rhsm_disconnected']):
+            self.click(locators['rhci.rhsm_disconnected'])
+        self.text_field_update(locators['rhci.rhsm_mirror'], disconnected_url)
+        path = self.wait_until_element(locators['rhci.manifest_upload_file'])
+        path.send_keys(disconnected_manifest)
+        self.wait_until_element(locators["rhci.manifest_upload_button"]).click()
+        self.wait_for_ajax()
+        # Waits till the below locator is visible or until 120 seconds.
+        self.wait_until_element(locators["rhci.manifest_upload_success"], 120)
         self.click(locators["rhci.next"])
 
     def _page_subscription_manager_apps(self, rhsm_sat_radio_loc):
