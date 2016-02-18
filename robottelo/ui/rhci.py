@@ -35,6 +35,8 @@ class RHCI(Base):
                export_domain_address=None, data_domain_share_path=None,
                export_domain_share_path=None, cfme_install_loc=None,
                cfme_root_password=None, cfme_admin_password=None, undercloud_address=None,
+               overcloud_external_nic=None, overcloud_prov_network=None,
+               overcloud_pub_network=None, overcloud_pub_gateway=None, overcloud_admin_pass=None,
                ):
         """
         Creates a new RHCI deployment with the provided details.
@@ -63,6 +65,9 @@ class RHCI(Base):
             self._page_discover_undercloud(undercloud_address, undercloud_user, undercloud_pass)
             self._page_register_nodes(overcloud_nodes)
             self._page_assign_nodes()
+            self._configure_overcloud(overcloud_external_nic, overcloud_prov_network,
+                                      overcloud_pub_network, overcloud_pub_gateway,
+                                      overcloud_admin_pass)
 
         # RHCI: RHEV Setup Type page.
         if "rhev" in products:
@@ -140,12 +145,47 @@ class RHCI(Base):
             self.text_field_update(locators['rhci.node_ipmi_pass'], node['password'])
             self.text_field_update(locators['rhci.node_nic_mac_address'], node['mac_address'])
         self.click(locators['rhci.node_register_nodes'])
+        # TODO: Wait for node count > 0
+        if self.wait_until_element(locators['rhci.node_flavor'], timeout=60):
+            self.wait_until_element(locators['rhci.node_flavor_count'], timeout=1200)
+
         self.wait_until_element_is_clickable(locators['rhci.next'],timeout=30)
         self.click(locators['rhci.next'])
 
     def _page_assign_nodes(self):
         # RHCI: Assign Nodes
         # Assign some roles here once nodes are registered
+        #Assign 1 node to Compute
+        self.click(locators['rhci.node_assign_role'])
+        self.click(locators['rhci.node_role_controller'])
+        self.click(locators['rhci.node_role_controller_count_select'])
+        self.click(locators['rhci.node_role_controller_dropdown_item'])
+
+        #Assign 1 node to Controller
+        self.click(locators['rhci.node_assign_role'])
+        self.click(locators['rhci.node_role_compute'])
+        self.click(locators['rhci.node_role_compute_count_select'])
+        self.click(locators['rhci.node_role_compute_dropdown_item'])
+
+        storage_list = [
+            locators['rhci.node_role_ceph'],
+            locators['rhci.node_role_cinder'],
+            locators['rhci.node_role_swift'], ]
+        for storage in storage_list:
+            self.click(locators['rhci.node_assign_role'])
+            self.click(storage)
+        self.wait_until_element_is_clickable(locators['rhci.next'],timeout=30)
+        self.click(locators['rhci.next'])
+
+    def _configure_overcloud(self, overcloud_external_nic, overcloud_prov_network,
+                             overcloud_pub_network, overcloud_pub_gateway, overcloud_admin_pass):
+        self.text_field_update(locators["rhci.osp_external_interface"], overcloud_external_nic)
+        self.text_field_update(locators["rhci.osp_private_network"], overcloud_prov_network)
+        self.text_field_update(locators["rhci.osp_public_network"], overcloud_pub_network)
+        self.text_field_update(locators["rhci.osp_public_gateway"], overcloud_pub_gateway)
+        self.text_field_update(locators["rhci.osp_overcloud_pass"], overcloud_admin_pass)
+        self.text_field_update(locators["rhci.osp_overcloud_pass_confirm"], overcloud_admin_pass)
+        self.wait_until_element_is_clickable(locators['rhci.next'],timeout=30)
         self.click(locators['rhci.next'])
 
     def _page_rhev_setup_type(self, rhev_setup_loc, rhev_setup_type):
