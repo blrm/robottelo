@@ -146,8 +146,11 @@ class RHCI(Base):
             self.text_field_update(locators['rhci.node_nic_mac_address'], node['mac_address'])
         self.click(locators['rhci.node_register_nodes'])
         # TODO: Wait for node count > 0
-        if self.wait_until_element(locators['rhci.node_flavor'], timeout=60):
-            self.wait_until_element(locators['rhci.node_flavor_count'], timeout=1200)
+        if not self.wait_until_element(locators['rhci.node_flavor'], timeout=60):
+            print "Timeout while waiting for Flavors table to display"
+
+        if not self.wait_until_element(locators['rhci.node_flavor_count'], timeout=1200):
+            print "Timeout while waiting for 'Node Count' to update"
 
         self.wait_until_element_is_clickable(locators['rhci.next'],timeout=30)
         self.click(locators['rhci.next'])
@@ -155,13 +158,18 @@ class RHCI(Base):
     def _page_assign_nodes(self):
         # RHCI: Assign Nodes
         # Assign some roles here once nodes are registered
-        #Assign 1 node to Compute
+
+        if not self.wait_until_element_is_clickable(locators['rhci.node_assign_role'], timeout=30):
+            print "Timeout while waiting for 'Assign Role' to display: Controller"
+        #Assign 1 node to Controller
         self.click(locators['rhci.node_assign_role'])
         self.click(locators['rhci.node_role_controller'])
         self.click(locators['rhci.node_role_controller_count_select'])
         self.click(locators['rhci.node_role_controller_dropdown_item'])
 
-        #Assign 1 node to Controller
+        if not self.wait_until_element_is_clickable(locators['rhci.node_assign_role'], timeout=30):
+            print "Timeout while waiting for 'Assign Role' to display: Compute"
+        #Assign 1 node to Compute
         self.click(locators['rhci.node_assign_role'])
         self.click(locators['rhci.node_role_compute'])
         self.click(locators['rhci.node_role_compute_count_select'])
@@ -172,8 +180,13 @@ class RHCI(Base):
             locators['rhci.node_role_cinder'],
             locators['rhci.node_role_swift'], ]
         for storage in storage_list:
+            if not self.wait_until_element_is_clickable(
+                locators['rhci.node_assign_role'], timeout=30):
+
+                print "Timeout while waiting for 'Assign Role' to display"
             self.click(locators['rhci.node_assign_role'])
             self.click(storage)
+
         self.wait_until_element_is_clickable(locators['rhci.next'],timeout=30)
         self.click(locators['rhci.next'])
 
