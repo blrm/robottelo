@@ -77,7 +77,7 @@ class RHCI(Base):
         if "cloudforms" in products:
             self._page_cloudforms_configuration(cfme_install_locator, cfme_root_password, cfme_admin_password)
 
-        if disconnected_url:
+        if disconnected_url and disconnected_manifest:
             self._page_disconnected(disconnected_url, disconnected_manifest)
         else:
             self._page_redhat_login(rhsm_username, rhsm_password)
