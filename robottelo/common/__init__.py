@@ -93,7 +93,8 @@ def _configure_logging(verbosity=2):
 
     """
     try:
-        config.fileConfig(os.path.join(get_app_root(), 'logging.conf'))
+        config.fileConfig(os.path.join(get_app_root(), 'logging.conf'),
+                          disable_existing_loggers=False)
     except NoSectionError:
         logging.basicConfig(
             format='%(levelname)s %(module)s:%(lineno)d: %(message)s'

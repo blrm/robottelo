@@ -2055,6 +2055,22 @@ locators = LocatorDict({
         By.XPATH, "//button[contains(.,'Attach Selected')]"),
     "rhci.deploy": (
         By.XPATH, "//button[contains(.,'Deploy')]"),
+    "rhci.rhsm_mirror": (
+        By.XPATH,
+        ("//div[contains(@class,'form-group')]/label[contains(.,'Content Mirror URL')]"
+        "/following-sibling::div/input")),
+    "rhci.rhsm_disconnected": (
+        By.XPATH,
+        "//input[@type='radio' and contains(@value, 'disconnected')]"),
+    "rhci.manifest_upload_file": (
+        By.XPATH,
+        "//*[@type='file' and @id='manifest-file-field']"),
+    "rhci.manifest_upload_button": (
+        By.XPATH,
+        "//button[text()='Upload']"),
+    "rhci.manifest_upload_success": (
+        By.XPATH,
+        "//*[contains(@class, 'alert-success')]"),
 
     # Hardware Models
     "hwmodels.new": (
