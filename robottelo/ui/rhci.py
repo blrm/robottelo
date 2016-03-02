@@ -8,6 +8,7 @@ from time import sleep
 from robottelo.ui.base import Base
 from robottelo.ui.locators import locators
 from robottelo.common.helpers import get_server_url
+from selenium.webdriver.support.select import Select
 import requests
 import socket, errno
 
@@ -36,6 +37,7 @@ class RHCI(Base):
                export_domain_share_path=None, cfme_install_loc=None,
                cfme_root_password=None, cfme_admin_password=None, undercloud_address=None,
                overcloud_external_nic=None, overcloud_prov_network=None,
+               overcloud_controller_count=None, overcloud_compute_count=None,
                overcloud_pub_network=None, overcloud_pub_gateway=None, overcloud_admin_pass=None,
                disconnected_url=None, disconnected_manifest=None):
 
@@ -65,7 +67,7 @@ class RHCI(Base):
         if "openstack" in products:
             self._page_discover_undercloud(undercloud_address, undercloud_user, undercloud_pass)
             self._page_register_nodes(overcloud_nodes)
-            self._page_assign_nodes()
+            self._page_assign_nodes(overcloud_controller_count, overcloud_compute_count)
             self._configure_overcloud(overcloud_external_nic, overcloud_prov_network,
                                       overcloud_pub_network, overcloud_pub_gateway,
                                       overcloud_admin_pass)
@@ -138,46 +140,70 @@ class RHCI(Base):
 
     def _page_register_nodes(self, overcloud_nodes):
         # RHCI: Register Nodes
-        self.click(locators['rhci.register_nodes'])
-        for node_num, node in enumerate(overcloud_nodes):
-            if node_num > 0:
-                self.click(locators['rhci.node_add_node'])
-            self.click(locators['rhci.node_driver_select'])
-            self.click(interp_loc('rhci.node_driver_dropdown_item', node['driver']))
-            self.text_field_update(locators['rhci.node_ip_address'], node['ip_address'])
-            self.text_field_update(locators['rhci.node_ipmi_user'], node['username'])
-            self.text_field_update(locators['rhci.node_ipmi_pass'], node['password'])
-            self.text_field_update(locators['rhci.node_nic_mac_address'], node['mac_address'])
-        self.click(locators['rhci.node_register_nodes'])
+        node_count_loc = interp_loc('rhci.node_flavor_count', len(overcloud_nodes))
+
+        #Skip registering nodes if you have enough nodes available
+        if not self.is_element_enabled(node_count_loc):
+            self.click(locators['rhci.register_nodes'])
+            for node_num, node in enumerate(overcloud_nodes):
+                if node_num > 0:
+                    self.click(locators['rhci.node_add_node'])
+                self.click(locators['rhci.node_driver_select'])
+                self.click(interp_loc('rhci.node_driver_dropdown_item', node['driver']))
+                self.text_field_update(locators['rhci.node_ip_address'], node['ip_address'])
+                self.text_field_update(locators['rhci.node_ipmi_user'], node['username'])
+                self.text_field_update(locators['rhci.node_ipmi_pass'], node['password'])
+                self.text_field_update(locators['rhci.node_nic_mac_address'], node['mac_address'])
+            self.click(locators['rhci.node_register_nodes'])
+
         # TODO: Wait for node count > 0
         if not self.wait_until_element(locators['rhci.node_flavor'], timeout=60):
-            print "Timeout while waiting for Flavors table to display"
+            print "Register Nodes: Timeout while waiting for Flavors table to display"
 
-        if not self.wait_until_element(locators['rhci.node_flavor_count'], timeout=1200):
-            print "Timeout while waiting for 'Node Count' to update"
+        node_count_loc = interp_loc('rhci.node_flavor_count', len(overcloud_nodes))
+        if not self.wait_until_element(node_count_loc, timeout=1200):
+            print "Register Nodes: Timeout while waiting for 'Node Count' to update"
 
-        self.wait_until_element_is_clickable(locators['rhci.next'],timeout=30)
+        self.wait_until_element_is_clickable(locators['rhci.next'], timeout=30)
         self.click(locators['rhci.next'])
 
-    def _page_assign_nodes(self):
+    def _page_assign_nodes(self, controller_count, compute_count):
         # RHCI: Assign Nodes
         # Assign some roles here once nodes are registered
 
-        if not self.wait_until_element_is_clickable(locators['rhci.node_assign_role'], timeout=30):
-            print "Timeout while waiting for 'Assign Role' to display: Controller"
-        #Assign 1 node to Controller
-        self.click(locators['rhci.node_assign_role'])
-        self.click(locators['rhci.node_role_controller'])
-        self.click(locators['rhci.node_role_controller_count_select'])
-        self.click(locators['rhci.node_role_controller_dropdown_item'])
+        if not self.is_element_enabled(locators['rhci.node_role_controller']):
+            if not self.wait_until_element_is_clickable(locators['rhci.node_assign_role'], timeout=30):
+                print "Assign Nodes: Timeout while waiting for 'Assign Role' to display: Controller"
+            #Assign 1 node to Controller
+            print 'Clicking assign role'
+            self.click(locators['rhci.node_assign_role'])
+            if not self.wait_until_element_is_clickable(locators['rhci.node_role_controller'], timeout=30):
+                print "Assign Nodes: Timeout while waiting for Controller role"
+            print 'Assigning controller role'
+            self.click(locators['rhci.node_role_controller'])
+        ##### HACK UNTIL RHCI BRANCH IS REBASED ON TOP OF SOURCE BRANCH
+        # Making pure Selenium calls to update the select element.
+        # Robottelo master as assign_value to do this cleanly
+        element = self.wait_until_element(locators['rhci.node_role_controller_count_select'])
+        Select(element).select_by_visible_text(str(controller_count))
+        ##### HACK END
 
-        if not self.wait_until_element_is_clickable(locators['rhci.node_assign_role'], timeout=30):
-            print "Timeout while waiting for 'Assign Role' to display: Compute"
-        #Assign 1 node to Compute
-        self.click(locators['rhci.node_assign_role'])
-        self.click(locators['rhci.node_role_compute'])
-        self.click(locators['rhci.node_role_compute_count_select'])
-        self.click(locators['rhci.node_role_compute_dropdown_item'])
+        if not self.is_element_enabled(locators['rhci.node_role_compute']):
+            if not self.wait_until_element_is_clickable(locators['rhci.node_assign_role'], timeout=30):
+                print "Assign Nodes: Timeout while waiting for 'Assign Role' to display: Compute"
+            #Assign 1 node to Compute
+            print 'Clicking assign role'
+            self.click(locators['rhci.node_assign_role'])
+            if not self.wait_until_element_is_clickable(locators['rhci.node_role_compute'], timeout=30):
+                print "Assign Nodes: Timeout while waiting for Compute role"
+            print 'Assigning compute role'
+            self.click(locators['rhci.node_role_compute'])
+        ##### HACK UNTIL RHCI BRANCH IS REBASED ON TOP OF SOURCE BRANCH
+        # Making pure Selenium calls to update the select element.
+        # Robottelo master as assign_value to do this cleanly
+        element = self.wait_until_element(locators['rhci.node_role_compute_count_select'])
+        Select(element).select_by_visible_text(str(compute_count))
+        ##### HACK END
 
         storage_list = [
             locators['rhci.node_role_ceph'],
