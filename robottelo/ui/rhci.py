@@ -57,9 +57,11 @@ class RHCI(Base):
         # TODO: get rid of this locator once we have actual version checking
         rhai_present_locator = interp_loc('rhci.active_view', '1D. Access Insights')
 
+        # check whether the Configure Organization tab is present
+        org_present_locator = interp_loc('rhci.active_view', '1B. Configure Organization')
         self._page_software_selection(products)
 
-        self._page_satellite_configuration(sat_name, sat_desc)
+        self._page_satellite_configuration(sat_name, sat_desc, org_present_locator)
         self._page_lifecycle_environment(env_path_loc, env_path, update_lifecycle)
         self._page_access_insights(rhai_present_locator,enable_access_insights)
 
@@ -103,7 +105,7 @@ class RHCI(Base):
             self.click(interp_loc('rhci.product_select', prod))
         self.click(locators["rhci.select"])
 
-    def _page_satellite_configuration(self, sat_name, sat_desc):
+    def _page_satellite_configuration(self, sat_name, sat_desc, org_present_locator):
         # RHCI: Satellite Configuration
         if self.wait_until_element(locators["rhci.satellite_name"]):
             self.text_field_update(locators["rhci.satellite_name"], sat_name)
@@ -113,7 +115,10 @@ class RHCI(Base):
         # TODO: Add ability to add new deploy org once the feature is available
         # if self.wait_until_element(locators["rhci.deployment_org"]):
         #    self.find_element(locators["rhci.deployment_org"]).click()
-        self.click(locators["rhci.next"])
+        #
+        # The Configure Organization tab was removed at one point, so check whether the extra "next" click is necessary
+        if self.wait_until_element(org_present_locator):
+            self.click(locators["rhci.next"])
 
     def _page_lifecycle_environment(self, env_path_loc, env_path, update_lifecycle):
         # RHCI: Lifecycle environment page
