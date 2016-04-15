@@ -150,22 +150,35 @@ class RHCI(Base):
         #Skip registering nodes if you have enough nodes available
         if not self.is_element_enabled(node_count_loc):
             self.click(locators['rhci.register_nodes'])
+            # Select Manual Entry
+            self.wait_until_element(locators['rhci.node_register_manual'])
+            self.click(locators['rhci.node_register_manual'])
+
+            # Assume that all of the nodes are on the same libvirt server
+            libvirt_info = {
+                'driver': overcloud_nodes[0]['driver'],
+                'ip_address': overcloud_nodes[0]['ip_address'],
+                'username': overcloud_nodes[0]['username'],
+                'password': overcloud_nodes[0]['password'],
+                }
+            self.click(interp_loc('rhci.node_driver_dropdown_item', libvirt_info['driver']))
+            self.click(locators['rhci.node_driver_select'])
+            self.text_field_update(locators['rhci.node_ip_address'], libvirt_info['ip_address'])
+            self.text_field_update(locators['rhci.node_ipmi_user'], libvirt_info['username'])
+            self.text_field_update(locators['rhci.node_ipmi_pass'], libvirt_info['password'])
             for node_num, node in enumerate(overcloud_nodes):
                 if node_num > 0:
-                    self.click(locators['rhci.node_add_node'])
-                self.click(locators['rhci.node_driver_select'])
-                self.click(interp_loc('rhci.node_driver_dropdown_item', node['driver']))
-                self.text_field_update(locators['rhci.node_ip_address'], node['ip_address'])
-                self.text_field_update(locators['rhci.node_ipmi_user'], node['username'])
-                self.text_field_update(locators['rhci.node_ipmi_pass'], node['password'])
-                self.text_field_update(locators['rhci.node_nic_mac_address'], node['mac_address'])
-            self.click(locators['rhci.node_register_nodes'])
+                    self.click(locators['rhci.node_add_node_manual'])
+                self.text_field_update(interp_loc('rhci.node_nic_mac_address', str(node_num)),
+                    node['mac_address'])
+            self.wait_until_element_is_clickable(locators["rhci.node_node_register_submit"], timeout=30)
+            self.click(locators["rhci.node_node_register_submit"])
 
         # TODO: Wait for node count > 0
-        if not self.wait_until_element(locators['rhci.node_flavor'], timeout=60):
-            print "Register Nodes: Timeout while waiting for Flavors table to display"
+        if not self.wait_until_element(locators['rhci.node_manager_panel'], timeout=120):
+            print "Register Nodes: Timeout while waiting for OSP Manager table to display"
 
-        node_count_loc = interp_loc('rhci.node_flavor_count', len(overcloud_nodes))
+        node_count_loc = interp_loc('rhci.registered_node_count', len(overcloud_nodes))
         if not self.wait_until_element(node_count_loc, timeout=1200):
             print "Register Nodes: Timeout while waiting for 'Node Count' to update"
 
