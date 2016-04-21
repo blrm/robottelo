@@ -190,7 +190,7 @@ class RHCI(Base):
         # Assign some roles here once nodes are registered
 
         if not self.is_element_enabled(locators['rhci.node_role_controller']):
-            if not self.wait_until_element_is_clickable(locators['rhci.node_assign_role'], timeout=30):
+            if not self.wait_until_element_is_clickable(locators['rhci.node_assign_role'], timeout=60):
                 print "Assign Nodes: Timeout while waiting for 'Assign Role' to display: Controller"
             #Assign 1 node to Controller
             print 'Clicking assign role'
