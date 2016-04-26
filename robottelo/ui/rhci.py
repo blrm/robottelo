@@ -103,7 +103,7 @@ class RHCI(Base):
         # Select products to install
         for prod in products:
             self.click(interp_loc('rhci.product_select', prod))
-        self.click(locators["rhci.select"])
+        self.click(locators["rhci.next"])
 
     def _page_satellite_configuration(self, sat_name, sat_desc, org_present_locator):
         # RHCI: Satellite Configuration

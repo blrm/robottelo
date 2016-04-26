@@ -1937,9 +1937,9 @@ locators = LocatorDict({
     "rhci.new": (
         By.XPATH, "//a[contains(.,'New Deployment')]"),
     "rhci.product_select": (
-        By.XPATH, "//span[contains(@id,'%s')]/div[contains(@class, 'rhci-footer-unselected')]"),
+        By.XPATH, "//span[contains(@id,'%s')]/div[contains(@class, 'product-item-checkbox')]/input"),
     "rhci.product_deselect": (
-        By.XPATH, "//span[contains(@id,'%s')]/div[contains(@class, 'rhci-footer-selected')]"),
+        By.XPATH, "//span[contains(@id,'%s')]/div[contains(@class, 'product-item-checkbox')]/input"),
     "rhci.next": (
         By.XPATH, "(//a|//button)[contains(.,'Next') and contains(@class, 'btn-primary') and not(contains(@class, 'disabled'))]"),
     "rhci.select": (
