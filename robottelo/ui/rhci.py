@@ -185,7 +185,8 @@ class RHCI(Base):
         self.wait_until_element_is_clickable(locators['rhci.next'], timeout=30)
         self.click(locators['rhci.next'])
 
-    def _page_assign_nodes(self, controller_count, compute_count):
+    def _page_assign_nodes(
+            self, controller_count, compute_count, ceph_count=0, cinder_count=0, swift_count=0):
         # RHCI: Assign Nodes
         # Assign some roles here once nodes are registered
 
@@ -193,7 +194,7 @@ class RHCI(Base):
             print 'Waiting for Loading... element to disappear'
             sleep(1)
 
-        print 'Starting assignment of Controler and Compute nodes'
+        print 'Starting assignment of OSP node roles'
         for role in [
                 { # Controller node role
                     'locator':locators['rhci.node_role_controller'],
@@ -204,7 +205,23 @@ class RHCI(Base):
                     'locator':locators['rhci.node_role_compute'],
                     'locator_count':locators['rhci.node_role_compute_count_select'],
                     'name': 'Compute',
-                    'count': compute_count}, ]:
+                    'count': compute_count},
+                { # Ceph node role
+                    'locator': locators['rhci.node_role_ceph'],
+                    'locator_count':locators['rhci.node_role_ceph_count_select'],
+                    'name': 'Ceph',
+                    'count': ceph_count},
+                { # Cinder node role
+                    'locator': locators['rhci.node_role_cinder'],
+                    'locator_count':locators['rhci.node_role_cinder_count_select'],
+                    'name': 'Cinder',
+                    'count': cinder_count},
+                { # Swift node role
+                    'locator': locators['rhci.node_role_swift'], 
+                    'locator_count':locators['rhci.node_role_swift_count_select'],
+                    'name': 'Swift',
+                    'count': swift_count}, ]:
+
             if not self.is_element_enabled(role['locator']):
                 #Assign X nodes to role
                 if not self.wait_until_element_is_clickable(
@@ -220,24 +237,16 @@ class RHCI(Base):
                     print 'Assign Nodes: Timeout while waiting for {} role'.format(role['name'])
                 print 'Assigning {} role'.format(role['name'])
                 self.click(role['locator'])
-            ##### HACK UNTIL RHCI BRANCH IS REBASED ON TOP OF SOURCE BRANCH
-            # Making pure Selenium calls to update the select element.
-            # Robottelo master as assign_value to do this cleanly
-            element = self.wait_until_element(role['locator_count'])
-            Select(element).select_by_visible_text(str(role['count']))
-            ##### HACK END
 
-        storage_list = [
-            locators['rhci.node_role_ceph'],
-            locators['rhci.node_role_cinder'],
-            locators['rhci.node_role_swift'], ]
-        for storage in storage_list:
-            if not self.wait_until_element_is_clickable(
-                locators['rhci.node_assign_role'], timeout=30):
+            if role['count'] > 0:
+                print 'Assigning {} role count of {}'.format(role['name'], role['count'])
+                ##### HACK UNTIL RHCI BRANCH IS REBASED ON TOP OF SOURCE BRANCH
+                # Making pure Selenium calls to update the select element.
+                # Robottelo master as assign_value to do this cleanly
+                element = self.wait_until_element(role['locator_count'])
+                Select(element).select_by_visible_text(str(role['count']))
+                ##### HACK END
 
-                print "Timeout while waiting for 'Assign Role' to display"
-            self.click(locators['rhci.node_assign_role'])
-            self.click(storage)
 
         self.wait_until_element_is_clickable(locators['rhci.next'],timeout=30)
         self.click(locators['rhci.next'])
