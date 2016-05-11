@@ -189,39 +189,43 @@ class RHCI(Base):
         # RHCI: Assign Nodes
         # Assign some roles here once nodes are registered
 
-        if not self.is_element_enabled(locators['rhci.node_role_controller']):
-            if not self.wait_until_element_is_clickable(locators['rhci.node_assign_role'], timeout=60):
-                print "Assign Nodes: Timeout while waiting for 'Assign Role' to display: Controller"
-            #Assign 1 node to Controller
-            print 'Clicking assign role'
-            self.click(locators['rhci.node_assign_role'])
-            if not self.wait_until_element_is_clickable(locators['rhci.node_role_controller'], timeout=30):
-                print "Assign Nodes: Timeout while waiting for Controller role"
-            print 'Assigning controller role'
-            self.click(locators['rhci.node_role_controller'])
-        ##### HACK UNTIL RHCI BRANCH IS REBASED ON TOP OF SOURCE BRANCH
-        # Making pure Selenium calls to update the select element.
-        # Robottelo master as assign_value to do this cleanly
-        element = self.wait_until_element(locators['rhci.node_role_controller_count_select'])
-        Select(element).select_by_visible_text(str(controller_count))
-        ##### HACK END
+        while self.is_element_visible(locators['rhci.spinner']):
+            print 'Waiting for Loading... element to disappear'
+            sleep(1)
 
-        if not self.is_element_enabled(locators['rhci.node_role_compute']):
-            if not self.wait_until_element_is_clickable(locators['rhci.node_assign_role'], timeout=30):
-                print "Assign Nodes: Timeout while waiting for 'Assign Role' to display: Compute"
-            #Assign 1 node to Compute
-            print 'Clicking assign role'
-            self.click(locators['rhci.node_assign_role'])
-            if not self.wait_until_element_is_clickable(locators['rhci.node_role_compute'], timeout=30):
-                print "Assign Nodes: Timeout while waiting for Compute role"
-            print 'Assigning compute role'
-            self.click(locators['rhci.node_role_compute'])
-        ##### HACK UNTIL RHCI BRANCH IS REBASED ON TOP OF SOURCE BRANCH
-        # Making pure Selenium calls to update the select element.
-        # Robottelo master as assign_value to do this cleanly
-        element = self.wait_until_element(locators['rhci.node_role_compute_count_select'])
-        Select(element).select_by_visible_text(str(compute_count))
-        ##### HACK END
+        print 'Starting assignment of Controler and Compute nodes'
+        for role in [
+                { # Controller node role
+                    'locator':locators['rhci.node_role_controller'],
+                    'locator_count':locators['rhci.node_role_controller_count_select'],
+                    'name': 'Controller',
+                    'count': controller_count},
+                { # Compute node role
+                    'locator':locators['rhci.node_role_compute'],
+                    'locator_count':locators['rhci.node_role_compute_count_select'],
+                    'name': 'Compute',
+                    'count': compute_count}, ]:
+            if not self.is_element_enabled(role['locator']):
+                #Assign X nodes to role
+                if not self.wait_until_element_is_clickable(
+                        locators['rhci.node_assign_role'], timeout=180):
+                    print 'Assign Nodes ({}): Assign role is not a clickable element'.format(
+                            role['name'])
+                    raise Exception('Unable to proceed because Assign Role element is missing')
+
+                print 'Clicking assign role'
+                self.click(locators['rhci.node_assign_role'])
+
+                if not self.wait_until_element_is_clickable(role['locator'], timeout=30):
+                    print 'Assign Nodes: Timeout while waiting for {} role'.format(role['name'])
+                print 'Assigning {} role'.format(role['name'])
+                self.click(role['locator'])
+            ##### HACK UNTIL RHCI BRANCH IS REBASED ON TOP OF SOURCE BRANCH
+            # Making pure Selenium calls to update the select element.
+            # Robottelo master as assign_value to do this cleanly
+            element = self.wait_until_element(role['locator_count'])
+            Select(element).select_by_visible_text(str(role['count']))
+            ##### HACK END
 
         storage_list = [
             locators['rhci.node_role_ceph'],

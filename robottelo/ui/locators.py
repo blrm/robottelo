@@ -1944,6 +1944,8 @@ locators = LocatorDict({
         By.XPATH, "(//a|//button)[contains(.,'Next') and contains(@class, 'btn-primary') and not(contains(@class, 'disabled'))]"),
     "rhci.select": (
         By.XPATH, "//a[contains(.,'Select') and contains(@class, 'btn-primary') and not(contains(@class, 'disabled'))]"),
+    "rhci.spinner": (
+        By.XPATH, "//div[contains(@class, 'spinner')]"),
     "rhci.satellite_name": (
         By.XPATH, "//input[@id='deployment_new_sat_name']"),
     "rhci.satellite_description": (
