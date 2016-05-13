@@ -189,6 +189,7 @@ class RHCI(Base):
             self, controller_count, compute_count, ceph_count=0, cinder_count=0, swift_count=0):
         # RHCI: Assign Nodes
         # Assign some roles here once nodes are registered
+        error_screenshot_name = 'webui_error_screenshot.png'
 
         while self.is_element_visible(locators['rhci.spinner']):
             print 'Waiting for Loading... element to disappear'
@@ -228,7 +229,7 @@ class RHCI(Base):
                         locators['rhci.node_assign_role'], timeout=180):
                     print 'Assign Nodes ({}): Assign role is not a clickable element'.format(
                             role['name'])
-                    self.browser.save_screenshot_as_file('assign_role_missing.png')
+                    self.browser.save_screenshot_as_file(error_screenshot_name)
                     raise Exception('Unable to proceed because Assign Role element is missing')
 
                 print 'Clicking assign role'
@@ -236,7 +237,7 @@ class RHCI(Base):
 
                 if not self.wait_until_element_is_clickable(role['locator'], timeout=30):
                     print 'Assign Nodes: Timeout while waiting for {} role'.format(role['name'])
-                    self.browser.save_screenshot_as_file('assign_role_missing_{}.png'.format(role['name']))
+                    self.browser.save_screenshot_as_file(error_screenshot_name)
                     raise Exception('Unable to proceed because Assign Role element is missing for {}'.format(role['name']))
                 print 'Assigning {} role'.format(role['name'])
                 self.click(role['locator'])
