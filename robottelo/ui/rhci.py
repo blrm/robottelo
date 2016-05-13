@@ -145,7 +145,7 @@ class RHCI(Base):
 
     def _page_register_nodes(self, overcloud_nodes):
         # RHCI: Register Nodes
-        node_count_loc = interp_loc('rhci.node_flavor_count', len(overcloud_nodes))
+        node_count_loc = interp_loc('rhci.registered_node_count', len(overcloud_nodes))
 
         #Skip registering nodes if you have enough nodes available
         if not self.is_element_enabled(node_count_loc):
@@ -178,7 +178,6 @@ class RHCI(Base):
         if not self.wait_until_element(locators['rhci.node_manager_panel'], timeout=120):
             print "Register Nodes: Timeout while waiting for OSP Manager table to display"
 
-        node_count_loc = interp_loc('rhci.registered_node_count', len(overcloud_nodes))
         if not self.wait_until_element(node_count_loc, timeout=1200):
             print "Register Nodes: Timeout while waiting for 'Node Count' to update"
 
@@ -190,10 +189,25 @@ class RHCI(Base):
         # RHCI: Assign Nodes
         # Assign some roles here once nodes are registered
         error_screenshot_name = 'webui_error_screenshot.png'
+        total_node_count = controller_count + compute_count + ceph_count + cinder_count + swift_count
 
         while self.is_element_visible(locators['rhci.spinner']):
             print 'Waiting for Loading... element to disappear'
             sleep(1)
+
+        # Wait for the page to display the 'Node Count: X' Under flavors
+        free_node_count_loc = interp_loc('rhci.node_flavor_count', total_node_count)
+        node_wait_sleep = 60
+        max_node_wait = 300
+        node_wait_total = 0
+
+        while not self.is_element_enabled(free_node_count_loc):
+            if node_wait_total < max_node_wait:
+                self.browser.get_screenshot_as_file(error_screenshot_name)
+                raise Exception("'Node Count: {}' was never enabled".format(total_node_count))
+            print 'Wait for Node Count: {}'.format(total_node_count)
+            sleep(node_wait_sleep)
+            node_wait_total += node_wait_sleep
 
         print 'Starting assignment of OSP node roles'
         for role in [
