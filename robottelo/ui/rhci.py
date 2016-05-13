@@ -202,7 +202,7 @@ class RHCI(Base):
         node_wait_total = 0
 
         while not self.is_element_enabled(free_node_count_loc):
-            if node_wait_total < max_node_wait:
+            if node_wait_total >= max_node_wait:
                 self.browser.get_screenshot_as_file(error_screenshot_name)
                 raise Exception("'Node Count: {}' was never enabled".format(total_node_count))
             print 'Wait for Node Count: {}'.format(total_node_count)
