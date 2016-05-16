@@ -189,26 +189,22 @@ class RHCI(Base):
         # RHCI: Assign Nodes
         # Assign some roles here once nodes are registered
         error_screenshot_name = 'webui_error_screenshot.png'
-        total_node_count = controller_count + compute_count + ceph_count + cinder_count + swift_count
 
         while self.is_element_visible(locators['rhci.spinner']):
             print 'Waiting for Loading... element to disappear'
             sleep(1)
 
-        # Wait for the page to display the 'Node Count: X' Under flavors
-        free_node_count_loc = interp_loc('rhci.node_flavor_count', total_node_count)
-        node_wait_sleep = 60
-        node_wait_max = 1200 # If it takes this long then something is wrong
-        node_wait_total = 0
-
-        while not self.is_element_enabled(free_node_count_loc):
-            if node_wait_total >= node_wait_max:
+        # Refresh the page if assign role isn't visible initially
+        refresh_attempts = 0
+        max_refresh_attempts = 3
+        while not self.is_element_visible(locators['rhci.node_assign_role']):
+            if refresh_attempts >= max_refresh_attempts:
+                print 'Assign Nodes (): Assign role is not visible on initial page load'
                 self.browser.get_screenshot_as_file(error_screenshot_name)
-                raise Exception("'Node Count: {}' was never enabled".format(total_node_count))
-            sleep(node_wait_sleep)
-            print 'Wait for Node Count: {}'.format(node_wait_total)
-            node_wait_total += node_wait_sleep
-
+                raise Exception('Unable to proceed because Assign Role element is missing')
+            self.browser.refresh()
+            refresh_attempts += 1
+            
         print 'Starting assignment of OSP node roles'
         for role in [
                 { # Controller node role
