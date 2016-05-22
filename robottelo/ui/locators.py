@@ -1985,16 +1985,16 @@ locators = LocatorDict({
     "rhci.registered_node_count": (By.XPATH, "//span[contains(@class, 'registered-node-count') and contains(., '%s')]"),
     "rhci.node_role_ceph": (By.XPATH, "//a[contains(@class,'role-ceph')]"),
     "rhci.node_role_ceph_count_select": (By.XPATH, "//li[contains(@class, 'role-ceph') and contains(@class, 'role-assigned')]/select"),
-    "rhci.node_role_cinder": (By.XPATH, "//a[contains(@class,'role-cinder')]"),
-    "rhci.node_role_cinder_count_select": (By.XPATH, "//li[contains(@class, 'role-cinder') and contains(@class, 'role-assigned')]/select"),
+    "rhci.node_role_block": (By.XPATH, "//a[contains(@class,'role-block-storage')]"),
+    "rhci.node_role_block_count_select": (By.XPATH, "//li[contains(@class, 'role-block-storage') and contains(@class, 'role-assigned')]/select"),
     "rhci.node_role_controller": (By.XPATH, "//a[contains(@class,'role-controller')]"),
     "rhci.node_role_controller_count_select": (By.XPATH, "//li[contains(@class, 'role-controller') and contains(@class, 'role-assigned')]/select"),
     "rhci.node_role_controller_dropdown_item": (By.XPATH, "//li[contains(@class, 'role-controller') and contains(@class, 'role-assigned')]/select/option[. = '%s']"),
     "rhci.node_role_compute": (By.XPATH, "//a[contains(@class,'role-compute')]"),
     "rhci.node_role_compute_count_select": (By.XPATH, "//li[contains(@class, 'role-compute') and contains(@class, 'role-assigned')]/select"),
     "rhci.node_role_compute_dropdown_item": (By.XPATH, "//li[contains(@class, 'role-compute') and contains(@class, 'role-assigned')]/select/option[. = '%s']"),
-    "rhci.node_role_swift": (By.XPATH, "//a[contains(@class,'role-swift')]"),
-    "rhci.node_role_swift_count_select": (By.XPATH, "//li[contains(@class, 'role-swift') and contains(@class, 'role-assigned')]/select"),
+    "rhci.node_role_object": (By.XPATH, "//a[contains(@class,'role-object-storage')]"),
+    "rhci.node_role_object_count_select": (By.XPATH, "//li[contains(@class, 'role-object-storage') and contains(@class, 'role-assigned')]/select"),
     "rhci.osp_external_interface": (By.XPATH, "//input[@id='external-osp-interface']"), 
     "rhci.osp_private_network": (By.XPATH, "//input[@id='osp-private-network']"),
     "rhci.osp_public_network": (By.XPATH, "//input[@id='osp-floating-network']"),
@@ -2067,6 +2067,10 @@ locators = LocatorDict({
         By.XPATH, "//input[@id='cfme_root_password']"),
     "rhci.confirm_cfme_root_password": (
         By.XPATH, "//input[@id='confirm_cfme_root_password']"),
+    "rhci.cfme_db_password": (
+        By.XPATH, "//input[@id='cfme_db_password']"),
+    "rhci.confirm_cfme_db_password": (
+        By.XPATH, "//input[@id='confirm_cfme_db_password']"),
     # TODO: File BZ, these rhsm inputs need IDs.
     "rhci.rhsm_username": (
         By.XPATH,

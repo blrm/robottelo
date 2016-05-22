@@ -35,8 +35,8 @@ class RHCI(Base):
                data_domain_name=None, export_domain_name=None, data_domain_address=None,
                export_domain_address=None, data_domain_share_path=None,
                export_domain_share_path=None, cfme_install_loc=None,
-               cfme_root_password=None, cfme_admin_password=None, undercloud_address=None,
-               overcloud_external_nic=None, overcloud_prov_network=None,
+               cfme_root_password=None, cfme_admin_password=None, cfme_db_password=None,
+               undercloud_address=None, overcloud_external_nic=None, overcloud_prov_network=None,
                overcloud_controller_count=None, overcloud_compute_count=None,
                overcloud_pub_network=None, overcloud_pub_gateway=None, overcloud_admin_pass=None,
                disconnected_url=None, disconnected_manifest=None):
@@ -85,7 +85,7 @@ class RHCI(Base):
                                                   rhev_storage_type_loc)
 
         if "cloudforms" in products:
-            self._page_cloudforms_configuration(cfme_install_locator, cfme_root_password, cfme_admin_password)
+            self._page_cloudforms_configuration(cfme_install_locator, cfme_root_password, cfme_admin_password, cfme_db_password)
 
         if disconnected_url and disconnected_manifest:
             self._page_disconnected(disconnected_url, disconnected_manifest)
@@ -185,7 +185,7 @@ class RHCI(Base):
         self.click(locators['rhci.next'])
 
     def _page_assign_nodes(
-            self, controller_count, compute_count, ceph_count=0, cinder_count=0, swift_count=0):
+            self, controller_count, compute_count, ceph_count=0, block_count=0, object_count=0):
         # RHCI: Assign Nodes
         # Assign some roles here once nodes are registered
         error_screenshot_name = 'webui_error_screenshot.png'
@@ -222,16 +222,16 @@ class RHCI(Base):
                     'locator_count':locators['rhci.node_role_ceph_count_select'],
                     'name': 'Ceph',
                     'count': ceph_count},
-                { # Cinder node role
-                    'locator': locators['rhci.node_role_cinder'],
-                    'locator_count':locators['rhci.node_role_cinder_count_select'],
-                    'name': 'Cinder',
-                    'count': cinder_count},
-                { # Swift node role
-                    'locator': locators['rhci.node_role_swift'], 
-                    'locator_count':locators['rhci.node_role_swift_count_select'],
-                    'name': 'Swift',
-                    'count': swift_count}, ]:
+                { # Block node role
+                    'locator': locators['rhci.node_role_block'],
+                    'locator_count':locators['rhci.node_role_block_count_select'],
+                    'name': 'Block',
+                    'count': block_count},
+                { # Object node role
+                    'locator': locators['rhci.node_role_object'], 
+                    'locator_count':locators['rhci.node_role_object_count_select'],
+                    'name': 'Object',
+                    'count': object_count}, ]:
 
             if not self.is_element_enabled(role['locator']):
                 #Assign X nodes to role
@@ -330,7 +330,7 @@ class RHCI(Base):
                     export_domain_share_path)
             self.click(locators["rhci.next"])
 
-    def _page_cloudforms_configuration(self, cfme_install_locator, cfme_root_password, cfme_admin_password):
+    def _page_cloudforms_configuration(self, cfme_install_locator, cfme_root_password, cfme_admin_password, cfme_db_password):
         # RHCI: Cloudforms configuration page.
         if self.wait_until_element(cfme_install_locator):
             self.click(cfme_install_locator)
@@ -340,9 +340,16 @@ class RHCI(Base):
         self.text_field_update(locators['rhci.cfme_root_password'], cfme_root_password)
         if self.wait_until_element(locators['rhci.confirm_cfme_root_password'],timeout=5):
             self.text_field_update(locators['rhci.confirm_cfme_root_password'], cfme_root_password)
+
         self.text_field_update(locators['rhci.cfme_admin_password'], cfme_admin_password)
         if self.wait_until_element(locators['rhci.confirm_cfme_admin_password'], timeout=5):
             self.text_field_update(locators['rhci.confirm_cfme_admin_password'], cfme_admin_password)
+
+        if self.is_element_visible(locators['rhci.cfme_db_password']):
+            self.text_field_update(locators['rhci.cfme_db_password'], cfme_db_password)
+            if self.wait_until_element(locators['rhci.confirm_cfme_db_password'], timeout=5):
+                self.text_field_update(locators['rhci.confirm_cfme_db_password'], cfme_db_password)
+
         self.click(locators["rhci.next"])
 
     def _page_redhat_login(self, rhsm_username, rhsm_password):
