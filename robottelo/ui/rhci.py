@@ -331,11 +331,13 @@ class RHCI(Base):
             self.click(locators["rhci.next"])
 
     def _page_cloudforms_configuration(self, cfme_install_locator, cfme_root_password, cfme_admin_password, cfme_db_password):
+        print "CloudForms Install Location page"
         # RHCI: Cloudforms configuration page.
         if self.wait_until_element(cfme_install_locator):
             self.click(cfme_install_locator)
         self.click(locators['rhci.next'])
 
+        print "CloudForms credentials configuration page"
         self.wait_until_element(locators['rhci.cfme_root_password'])
         self.text_field_update(locators['rhci.cfme_root_password'], cfme_root_password)
         if self.wait_until_element(locators['rhci.confirm_cfme_root_password'],timeout=5):
@@ -353,6 +355,7 @@ class RHCI(Base):
         self.click(locators["rhci.next"])
 
     def _page_redhat_login(self, rhsm_username, rhsm_password):
+        print "Customer Portal Login Page"
         # RHCI: Subscription Credentials page.
         if self.wait_until_element(locators['rhci.rhsm_username']):
             self.text_field_update(locators['rhci.rhsm_username'], rhsm_username)
@@ -372,12 +375,14 @@ class RHCI(Base):
         self.click(locators["rhci.next"])
 
     def _page_subscription_manager_apps(self, rhsm_sat_radio_loc):
+        print "Selecting Subscription Management Application"
         # RHCI: Subscription Management Application.
         self.wait_until_element(rhsm_sat_radio_loc)
         self.click(rhsm_sat_radio_loc)
         self.click(locators["rhci.next"])
 
     def _page_select_subscriptions(self, sub_check_locs):
+        print "Selecting Subscriptions"
         # RHCI: Select Subscriptions
         for sub_check_loc in sub_check_locs:
             if self.wait_until_element(sub_check_loc):
@@ -386,7 +391,10 @@ class RHCI(Base):
 
     def _page_review_subscriptions(self):
         # RHCI: Review Subscriptions
-        self.click(locators["rhci.next"])
+        print "Review  Subscriptions Page"
+        # Disable the ajax wait.  The addition of the "Syncing OpenStack..." API call server side
+        # was causing the click method to click the button while still searching for the button
+        self.click(locators["rhci.next"], wait_for_ajax=False)
 
     def _page_review_deployment(self):
         def wait_for_server_connection():
@@ -406,6 +414,8 @@ class RHCI(Base):
                         raise
 
         # RHCI: Review Installation page.
+        print "Review Installation page"
+        self.wait_until_element_is_clickable(locators["rhci.deploy"], timeout=90)
         self.click(locators["rhci.deploy"], timeout=300)
         # Wait a *long time* for the deployment to complete
         # Sleep for five minutes, then check if the next button is available to click
