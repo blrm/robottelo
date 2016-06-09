@@ -59,42 +59,48 @@ class RHCI(Base):
 
         # check whether the Configure Organization tab is present
         org_present_locator = interp_loc('rhci.active_view', '1B. Configure Organization')
-        self._page_software_selection(products)
+        error_screenshot_name = 'webui_error_screenshot.png'
+        try:
+            self._page_software_selection(products)
 
-        self._page_satellite_configuration(sat_name, sat_desc, org_present_locator)
-        self._page_lifecycle_environment(env_path_loc, env_path, update_lifecycle)
-        self._page_access_insights(rhai_present_locator,enable_access_insights)
+            self._page_satellite_configuration(sat_name, sat_desc, org_present_locator)
+            self._page_lifecycle_environment(env_path_loc, env_path, update_lifecycle)
+            self._page_access_insights(rhai_present_locator,enable_access_insights)
 
-        # RHCI: Openstack Configuration
-        if "openstack" in products:
-            self._page_discover_undercloud(undercloud_address, undercloud_user, undercloud_pass)
-            self._page_register_nodes(overcloud_nodes)
-            self._page_assign_nodes(overcloud_controller_count, overcloud_compute_count)
-            self._configure_overcloud(overcloud_external_nic, overcloud_prov_network,
-                                      overcloud_pub_network, overcloud_pub_gateway,
-                                      overcloud_admin_pass)
+            # RHCI: Openstack Configuration
+            if "openstack" in products:
+                self._page_discover_undercloud(undercloud_address, undercloud_user, undercloud_pass)
+                self._page_register_nodes(overcloud_nodes)
+                self._page_assign_nodes(overcloud_controller_count, overcloud_compute_count)
+                self._configure_overcloud(overcloud_external_nic, overcloud_prov_network,
+                                          overcloud_pub_network, overcloud_pub_gateway,
+                                          overcloud_admin_pass)
 
-        # RHCI: RHEV Setup Type page.
-        if "rhev" in products:
-            self._page_rhev_setup_type(rhev_setup_loc, rhev_setup_type)
-            self._page_rhev_engine_selection(rhevm_mac_loc)
-            self._page_rhev_hypervisor_selection(rhevh_mac_locs)
-            self._page_rhev_configuration(rhevm_adminpass, datacenter_name, cluster_name, cpu_type)
-            self._page_rhev_storage_configuration(data_domain_name, data_domain_address, data_domain_share_path,
-                                                  export_domain_name, export_domain_address, export_domain_share_path,
-                                                  rhev_storage_type_loc)
+            # RHCI: RHEV Setup Type page.
+            if "rhev" in products:
+                self._page_rhev_setup_type(rhev_setup_loc, rhev_setup_type)
+                self._page_rhev_engine_selection(rhevm_mac_loc)
+                self._page_rhev_hypervisor_selection(rhevh_mac_locs)
+                self._page_rhev_configuration(rhevm_adminpass, datacenter_name, cluster_name, cpu_type)
+                self._page_rhev_storage_configuration(data_domain_name, data_domain_address, data_domain_share_path,
+                                                      export_domain_name, export_domain_address, export_domain_share_path,
+                                                      rhev_storage_type_loc)
 
-        if "cloudforms" in products:
-            self._page_cloudforms_configuration(cfme_install_locator, cfme_root_password, cfme_admin_password, cfme_db_password)
+            if "cloudforms" in products:
+                self._page_cloudforms_configuration(cfme_install_locator, cfme_root_password, cfme_admin_password, cfme_db_password)
 
-        if disconnected_url and disconnected_manifest:
-            self._page_disconnected(disconnected_url, disconnected_manifest)
-        else:
-            self._page_redhat_login(rhsm_username, rhsm_password)
-            self._page_subscription_manager_apps(rhsm_sat_radio_loc)
-            self._page_select_subscriptions(sub_check_locs)
-        self._page_review_subscriptions()
-        self._page_review_deployment()
+            if disconnected_url and disconnected_manifest:
+                self._page_disconnected(disconnected_url, disconnected_manifest)
+            else:
+                self._page_redhat_login(rhsm_username, rhsm_password)
+                self._page_subscription_manager_apps(rhsm_sat_radio_loc)
+                self._page_select_subscriptions(sub_check_locs)
+            self._page_review_subscriptions()
+            self._page_review_deployment()
+        except:
+            self.browser.get_screenshot_as_file(error_screenshot_name)
+            raise
+
 
     def _page_software_selection(self, products):
         # RHCI: software selection page
@@ -188,7 +194,6 @@ class RHCI(Base):
             self, controller_count, compute_count, ceph_count=0, block_count=0, object_count=0):
         # RHCI: Assign Nodes
         # Assign some roles here once nodes are registered
-        error_screenshot_name = 'webui_error_screenshot.png'
 
         while self.is_element_visible(locators['rhci.spinner']):
             print 'Waiting for Loading... element to disappear'
@@ -200,7 +205,6 @@ class RHCI(Base):
         while not self.is_element_visible(locators['rhci.node_assign_role']):
             if refresh_attempts >= max_refresh_attempts:
                 print 'Assign Nodes (): Assign role is not visible on initial page load'
-                self.browser.get_screenshot_as_file(error_screenshot_name)
                 raise Exception('Unable to proceed because Assign Role element is missing')
             self.browser.refresh()
             refresh_attempts += 1
@@ -234,12 +238,15 @@ class RHCI(Base):
                     'count': object_count}, ]:
 
             if not self.is_element_enabled(role['locator']):
+                if role['count'] < 1:
+                    # Don't assign a role is there are zero nodes available
+                    continue
+
                 #Assign X nodes to role
                 if not self.wait_until_element_is_clickable(
                         locators['rhci.node_assign_role'], timeout=180):
                     print 'Assign Nodes ({}): Assign role is not a clickable element'.format(
                             role['name'])
-                    self.browser.get_screenshot_as_file(error_screenshot_name)
                     raise Exception('Unable to proceed because Assign Role element is missing')
 
                 print 'Clicking assign role'
@@ -247,12 +254,10 @@ class RHCI(Base):
 
                 if not self.wait_until_element_is_clickable(role['locator'], timeout=30):
                     print 'Assign Nodes: Timeout while waiting for {} role'.format(role['name'])
-                    self.browser.get_screenshot_as_file(error_screenshot_name)
                     raise Exception('Unable to proceed because Assign Role element is missing for {}'.format(role['name']))
                 print 'Assigning {} role'.format(role['name'])
                 self.click(role['locator'])
 
-            if role['count'] > 0:
                 print 'Assigning {} role count of {}'.format(role['name'], role['count'])
                 ##### HACK UNTIL RHCI BRANCH IS REBASED ON TOP OF SOURCE BRANCH
                 # Making pure Selenium calls to update the select element.
