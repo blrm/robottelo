@@ -39,7 +39,14 @@ class RHCI(Base):
                undercloud_address=None, overcloud_external_nic=None, overcloud_prov_network=None,
                overcloud_controller_count=None, overcloud_compute_count=None,
                overcloud_pub_network=None, overcloud_pub_gateway=None, overcloud_admin_pass=None,
-               disconnected_url=None, disconnected_manifest=None):
+               disconnected_url=None, disconnected_manifest=None, ose_install_loc=None,
+               ose_storage_size=None, ose_username=None, ose_user_password=None,
+               ose_root_password=None, ose_master_vcpu=None, ose_master_ram=None,
+               ose_master_disk=None, ose_node_vcpu=None, ose_node_ram=None, ose_node_disk=None,
+               ose_available_vcpu=None, ose_available_ram=None, ose_available_disk=None,
+               ose_number_master_nodes=None, ose_number_worker_nodes=None, ose_storage_type=None,
+               ose_storage_name=None, ose_storage_host=None, ose_export_path=None,
+               ose_subdomain_name=None):
 
         """
         Creates a new RHCI deployment with the provided details.
