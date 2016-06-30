@@ -164,8 +164,6 @@ class RHCI(Base):
         if not self.is_element_enabled(node_count_loc):
             self.click(locators['rhci.register_nodes'])
             # Select Manual Entry
-            self.wait_until_element(locators['rhci.node_register_manual'])
-            self.click(locators['rhci.node_register_manual'])
 
             # Assume that all of the nodes are on the same libvirt server
             libvirt_info = {
@@ -174,16 +172,23 @@ class RHCI(Base):
                 'username': overcloud_nodes[0]['username'],
                 'password': overcloud_nodes[0]['password'],
                 }
+            self.text_field_update(locators['rhci.node_ip_address'], libvirt_info['ip_address'])
             self.click(interp_loc('rhci.node_driver_dropdown_item', libvirt_info['driver']))
             self.click(locators['rhci.node_driver_select'])
-            self.text_field_update(locators['rhci.node_ip_address'], libvirt_info['ip_address'])
             self.text_field_update(locators['rhci.node_ipmi_user'], libvirt_info['username'])
             self.text_field_update(locators['rhci.node_ipmi_pass'], libvirt_info['password'])
+            osp_node_macs = []
+            # Need to append the macs into a string separated by newlines
             for node_num, node in enumerate(overcloud_nodes):
-                if node_num > 0:
-                    self.click(locators['rhci.node_add_node_manual'])
-                self.text_field_update(interp_loc('rhci.node_nic_mac_address', str(node_num)),
-                    node['mac_address'])
+                osp_node_macs.append(node['mac_address'])
+
+            if len(osp_node_macs) != len(overcloud_nodes):
+                raise Exception(
+                    'The number of mac address({}) for OSP node registration is not the same as'
+                    ' the number of overcloud nodes({})'.format(
+                        len(osp_node_macs), len(overcloud_nodes)))
+
+            self.text_field_update(locators['rhci.node_nic_mac_addresses'], '\n'.join(osp_node_macs))
             self.wait_until_element_is_clickable(locators["rhci.node_node_register_submit"], timeout=30)
             self.click(locators["rhci.node_node_register_submit"])
 
