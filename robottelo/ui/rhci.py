@@ -346,15 +346,15 @@ class RHCI(Base):
             self.text_field_update(locators["rhci.data_domain_share_path"], data_domain_share_path)
             # TODO: identify storage fields that should be present based on products being installed.
             if self.wait_until_element(locators["rhci.export_domain_name"],timeout=5):
-                self.text_field_update(locators["rhci.export_domain_name"], selfhosted_domain_name)
-                self.text_field_update(locators["rhci.export_domain_address"], selfhosted_domain_address)
+                self.text_field_update(locators["rhci.export_domain_name"], export_domain_name)
+                self.text_field_update(locators["rhci.export_domain_address"], export_domain_address)
                 self.text_field_update(locators["rhci.export_domain_share_path"],
-                    selfhosted_domain_share_path)
-            if self.wait_until_element(locators["rhci.selfhosted_domain_name"],timeout=5):
-                self.text_field_update(locators["rhci.selfhosted_domain_name"], export_domain_name)
-                self.text_field_update(locators["rhci.selfhosted_domain_address"], export_domain_address)
-                self.text_field_update(locators["rhci.selfhosted_domain_share_path"],
                     export_domain_share_path)
+            if self.wait_until_element(locators["rhci.selfhosted_domain_name"],timeout=5):
+                self.text_field_update(locators["rhci.selfhosted_domain_name"], selfhosted_domain_name)
+                self.text_field_update(locators["rhci.selfhosted_domain_address"], selfhosted_domain_address)
+                self.text_field_update(locators["rhci.selfhosted_domain_share_path"],
+                    selfhosted_domain_share_path)
             self.click(locators["rhci.next"])
 
     def _page_cloudforms_configuration(self, cfme_install_locator, cfme_root_password, cfme_admin_password, cfme_db_password):
