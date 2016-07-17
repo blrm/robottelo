@@ -1997,7 +1997,7 @@ locators = LocatorDict({
     "rhci.node_role_compute_dropdown_item": (By.XPATH, "//li[contains(@class, 'role-compute') and contains(@class, 'role-assigned')]/select/option[. = '%s']"),
     "rhci.node_role_object": (By.XPATH, "//a[contains(@class,'role-object-storage') or contains(@class,'role-swift')]"),
     "rhci.node_role_object_count_select": (By.XPATH, "//li[contains(@class, 'role-object-storage') or contains(@class, 'role-swift')][contains(@class, 'role-assigned')]/select"),
-    "rhci.osp_external_interface": (By.XPATH, "//input[@id='external-osp-interface']"), 
+    "rhci.osp_external_interface": (By.XPATH, "//input[@id='external-osp-interface']"),
     "rhci.osp_private_network": (By.XPATH, "//input[@id='osp-private-network']"),
     "rhci.osp_public_network": (By.XPATH, "//input[@id='osp-floating-network']"),
     "rhci.osp_public_gateway": (By.XPATH, "//input[@id='osp-float-gatewway']"),
@@ -2045,14 +2045,20 @@ locators = LocatorDict({
         By.XPATH, "//input[@id='rhev_storage_name']"),
     "rhci.export_domain_name": (
         By.XPATH, "//input[@id='rhev_export_domain_name']"),
+    "rhci.selfhosted_domain_name": (
+        By.XPATH, "//input[@id='hosted_storage_name']"),
     "rhci.data_domain_address": (
         By.XPATH, "//input[@id='rhev_storage_address']"),
     "rhci.export_domain_address": (
         By.XPATH, "//input[@id='rhev_export_domain_address']"),
+    "rhci.selfhosted_domain_address": (
+        By.XPATH, "//input[@id='hosted_storage_address']"),
     "rhci.data_domain_share_path": (
         By.XPATH, "//input[@id='rhev_share_path']"),
     "rhci.export_domain_share_path": (
         By.XPATH, "//input[@id='rhev_export_domain_path']"),
+    "rhci.selfhosted_domain_share_path": (
+        By.XPATH, "//input[@id='hosted_storage_path']"),
     "rhci.bc_cloudforms": (
         By.XPATH,
         "//div[@class='wizard-block']//li[contains(.,'CloudForms')]/div"),

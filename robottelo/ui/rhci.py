@@ -34,7 +34,8 @@ class RHCI(Base):
                datacenter_name=None, cluster_name=None, cpu_type=None, storage_type=None,
                data_domain_name=None, export_domain_name=None, data_domain_address=None,
                export_domain_address=None, data_domain_share_path=None,
-               export_domain_share_path=None, cfme_install_loc=None,
+               export_domain_share_path=None, selfhosted_domain_address=None,
+               selfhosted_domain_share_path=None, selfhosted_domain_name=None, cfme_install_loc=None,
                cfme_root_password=None, cfme_admin_password=None, cfme_db_password=None,
                undercloud_address=None, overcloud_external_nic=None, overcloud_prov_network=None,
                overcloud_controller_count=None, overcloud_compute_count=None,
@@ -86,12 +87,15 @@ class RHCI(Base):
             # RHCI: RHEV Setup Type page.
             if "rhev" in products:
                 self._page_rhev_setup_type(rhev_setup_loc, rhev_setup_type)
-                self._page_rhev_engine_selection(rhevm_mac_loc)
+                # Only go to the engine selection page if RHEV is not self-hosted
+                if "selfhost" not in rhev_setup_type:
+                    self._page_rhev_engine_selection(rhevm_mac_loc)
                 self._page_rhev_hypervisor_selection(rhevh_mac_locs)
                 self._page_rhev_configuration(rhevm_adminpass, datacenter_name, cluster_name, cpu_type)
                 self._page_rhev_storage_configuration(data_domain_name, data_domain_address, data_domain_share_path,
                                                       export_domain_name, export_domain_address, export_domain_share_path,
-                                                      rhev_storage_type_loc)
+                                                      rhev_storage_type_loc, selfhosted_domain_name,
+                                                      selfhosted_domain_address, selfhosted_domain_share_path)
 
             if "cloudforms" in products:
                 self._page_cloudforms_configuration(cfme_install_locator, cfme_root_password, cfme_admin_password, cfme_db_password)
@@ -220,7 +224,7 @@ class RHCI(Base):
                 raise Exception('Unable to proceed because Assign Role element is missing')
             self.browser.refresh()
             refresh_attempts += 1
-            
+
         print 'Starting assignment of OSP node roles'
         for role in [
                 { # Controller node role
@@ -244,7 +248,7 @@ class RHCI(Base):
                     'name': 'Block',
                     'count': block_count},
                 { # Object node role
-                    'locator': locators['rhci.node_role_object'], 
+                    'locator': locators['rhci.node_role_object'],
                     'locator_count':locators['rhci.node_role_object_count_select'],
                     'name': 'Object',
                     'count': object_count}, ]:
@@ -331,7 +335,8 @@ class RHCI(Base):
 
     def _page_rhev_storage_configuration(self, data_domain_name, data_domain_address, data_domain_share_path,
                                          export_domain_name, export_domain_address, export_domain_share_path,
-                                         rhev_storage_type_loc):
+                                         rhev_storage_type_loc, selfhosted_domain_name, selfhosted_domain_address,
+                                         selfhosted_domain_share_path):
         # RHCI: RHEV Storage page.
         if self.wait_until_element(rhev_storage_type_loc):
             self.click(rhev_storage_type_loc)
@@ -345,6 +350,11 @@ class RHCI(Base):
                 self.text_field_update(locators["rhci.export_domain_address"], export_domain_address)
                 self.text_field_update(locators["rhci.export_domain_share_path"],
                     export_domain_share_path)
+            if self.wait_until_element(locators["rhci.selfhosted_domain_name"],timeout=5):
+                self.text_field_update(locators["rhci.selfhosted_domain_name"], selfhosted_domain_name)
+                self.text_field_update(locators["rhci.selfhosted_domain_address"], selfhosted_domain_address)
+                self.text_field_update(locators["rhci.selfhosted_domain_share_path"],
+                    selfhosted_domain_share_path)
             self.click(locators["rhci.next"])
 
     def _page_cloudforms_configuration(self, cfme_install_locator, cfme_root_password, cfme_admin_password, cfme_db_password):
