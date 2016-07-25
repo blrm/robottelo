@@ -47,7 +47,7 @@ class RHCI(Base):
                ose_available_vcpu=None, ose_available_ram=None, ose_available_disk=None,
                ose_number_master_nodes=None, ose_number_worker_nodes=None, ose_storage_type=None,
                ose_storage_name=None, ose_storage_host=None, ose_export_path=None,
-               ose_subdomain_name=None):
+               ose_subdomain_name=None, ose_sample_apps=None):
 
         """
         Creates a new RHCI deployment with the provided details.
@@ -96,6 +96,17 @@ class RHCI(Base):
                                                       export_domain_name, export_domain_address, export_domain_share_path,
                                                       rhev_storage_type_loc, selfhosted_domain_name,
                                                       selfhosted_domain_address, selfhosted_domain_share_path)
+
+            if "openshift" in products:
+                self._page_openshift_node_configuration(
+                    ose_storage_size,  ose_number_master_nodes,
+                    ose_master_vcpu, ose_master_ram, ose_master_disk,
+                    ose_number_worker_nodes, ose_node_vcpu, ose_node_ram, ose_node_disk,
+                    ose_available_vcpu, ose_available_ram, ose_available_disk)
+
+                self._page_ose_configuration(
+                    ose_install_loc, ose_storage_type, ose_storage_host, ose_export_path,
+                    ose_username, ose_user_password, ose_subdomain_name, ose_sample_apps)
 
             if "cloudforms" in products:
                 self._page_cloudforms_configuration(cfme_install_locator, cfme_root_password, cfme_admin_password, cfme_db_password)
@@ -378,6 +389,56 @@ class RHCI(Base):
             self.text_field_update(locators['rhci.cfme_db_password'], cfme_db_password)
             if self.wait_until_element(locators['rhci.confirm_cfme_db_password'], timeout=5):
                 self.text_field_update(locators['rhci.confirm_cfme_db_password'], cfme_db_password)
+
+        self.click(locators["rhci.next"])
+
+    def _page_openshift_node_configuration(
+        self,
+        ose_storage_size,  ose_number_master_nodes,
+        ose_master_vcpu, ose_master_ram, ose_master_disk,
+        ose_number_worker_nodes, ose_node_vcpu, ose_node_ram, ose_node_disk,
+        ose_available_vcpu, ose_available_ram, ose_available_disk):
+
+        total_node_count = int(ose_number_master_nodes) + int(ose_number_worker_nodes)
+
+        # 1 Master node is the only supported configuration
+        if not self.is_element_visible(
+            interp_loc('rhci.ose_master_node_count', ose_number_master_nodes)):
+            raise Exception("OSE Master Node count is not set to {}".format(
+                ose_number_master_nodes))
+
+        self.click(interp_loc('rhci.ose_worker_node_count', ose_number_worker_nodes))
+        self.click(interp_loc('rhci.ose_worker_node_storage_size', ose_node_disk))
+
+        if not self.is_element_visible(interp_loc(
+            'rhci.ose_env_summary_node_count', total_node_count)):
+            raise Exception("The OSE node count is not set to {}".format(total_node_count))
+
+        self.click(locators["rhci.next"])
+
+    def _page_ose_configuration(
+        self,
+        ose_install_loc, ose_storage_type, ose_storage_host, ose_export_path,
+        ose_username, ose_user_password, ose_subdomain_name, ose_sample_apps):
+
+        if ose_install_loc == 'NFS':
+            self.click(locators['rhci.ose_docker_storage_type_nfs'])
+        elif ose_install_loc == 'Gluster':
+            self.click(locators['rhci.ose_docker_storage_type_gluster'])
+
+        self.text_field_update(locators['rhci.ose_docker_storage_host'], ose_storage_host)
+        self.text_field_update(locators['rhci.ose_docker_storage_export_path'], ose_storage_host)
+        self.text_field_update(locators['rhci.ose_docker_storage_export_path'], ose_export_path)
+        self.text_field_update(locators['rhci.ose_account_name'], ose_username)
+        self.text_field_update(locators['rhci.ose_password'], ose_user_password)
+        self.text_field_update(locators['rhci.ose_password_confirm'], ose_user_password)
+        self.text_field_update(locators['rhci.ose_subdomain_name'], ose_subdomain_name)
+
+        import pdb
+        pdb.set_trace()
+
+        for app in ose_sample_apps:
+            self.click(interp_loc('rhci.ose_sample_app', app))
 
         self.click(locators["rhci.next"])
 

@@ -2079,6 +2079,36 @@ locators = LocatorDict({
         By.XPATH, "//input[@id='cfme_db_password']"),
     "rhci.confirm_cfme_db_password": (
         By.XPATH, "//input[@id='confirm_cfme_db_password']"),
+    "rhci.ose_master_node_count":(
+        By.XPATH, "//div[contains(@class, 'button-selection-selected')]/span[@data-qci='master-%s']"),
+    "rhci.ose_worker_node_count":(
+        By.XPATH, "//span[@data-qci='worker-%s']"),
+    "rhci.ose_env_summary_node_count":(
+        By.XPATH, "//div[contains(@class, 'env-summary-title')]/div[contains(., 'Node Count: %s')]"),
+    "rhci.ose_node_details_master_node_count":(
+        By.XPATH, "//div[contains(@class, 'node-details-block') and contains(., 'Each master node has:')]/../h1[contains(@class, 'num-ose-node') and contains(.,'%s')]"),
+    "rhci.ose_node_details_worker_node_count":(
+        By.XPATH, "//div[contains(@class, 'node-details-block') and contains(., 'Each worker node has:')]/../h1[contains(@class, 'num-ose-node') and contains(.,'%s')]"),
+    "rhci.ose_worker_node_storage_size":(
+        By.XPATH, "//span[@data-qci='storageSize-%s']"),
+    "rhci.ose_docker_storage_type_nfs":(
+        By.XPATH, "//input[@data-qci='nfs-storage-type' and @value='NFS']"),
+    "rhci.ose_docker_storage_type_gluster":(
+        By.XPATH, "//input[@data-qci='gluster-storage-type' and @value='GFS']"),
+    "rhci.ose_docker_storage_host":(
+        By.XPATH, "//input[@id='openshift_storage_host']"),
+    "rhci.ose_docker_storage_export_path":(
+        By.XPATH, "//input[@id='openshift_export_path']"),
+    "rhci.ose_account_name":(
+        By.XPATH, "//input[@id='openshift_username']"),
+    "rhci.ose_password":(
+        By.XPATH, "//input[@id='openshift_password']"),
+    "rhci.ose_password_confirm":(
+        By.XPATH, "//input[@id='confirm_openshift_password']"),
+    "rhci.ose_subdomain_name":(
+        By.XPATH, "//input[@id='openshift_subdomain_name']"),
+    "rhci.ose_sample_app":(
+        By.XPATH, "//input[@id='%s']"),
     # TODO: File BZ, these rhsm inputs need IDs.
     "rhci.rhsm_username": (
         By.XPATH,
@@ -2103,8 +2133,7 @@ locators = LocatorDict({
     "rhci.rhsm_disconnected": (
         By.XPATH,
         "//input[@type='radio' and contains(@value, 'disconnected')]"),
-    "rhci.manifest_upload_file": (
-        By.XPATH,
+    "rhci.manifest_upload_file": ( By.XPATH,
         "//*[@type='file' and @id='manifest-file-field']"),
     "rhci.manifest_upload_button": (
         By.XPATH,
