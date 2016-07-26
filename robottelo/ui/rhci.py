@@ -434,9 +434,6 @@ class RHCI(Base):
         self.text_field_update(locators['rhci.ose_password_confirm'], ose_user_password)
         self.text_field_update(locators['rhci.ose_subdomain_name'], ose_subdomain_name)
 
-        import pdb
-        pdb.set_trace()
-
         for app in ose_sample_apps:
             self.click(interp_loc('rhci.ose_sample_app', app))
 
