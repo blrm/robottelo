@@ -2121,9 +2121,9 @@ locators = LocatorDict({
     "rhci.rhsm_satellite_radio": (
         By.XPATH, "//input[@type='radio' and contains(@value, '%s')]"),
     "rhci.subscription_check": (
-        By.XPATH, "//td[contains(.,'%s')]/../td/input"),
-    "rhci.subscription_attach": (
-        By.XPATH, "//button[contains(.,'Attach Selected')]"),
+        By.XPATH, "//input[@name='isSelectedSubscription' and contains(@data-qci,'%s')]"),
+    "rhci.subscription_quantity_to_attach": (
+        By.XPATH, "//input[@name='qtyToAttach' and contains(@data-qci,'%s')]"),
     "rhci.deploy": (
         By.XPATH, "//button[contains(.,'Deploy')]"),
     "rhci.rhsm_mirror": (

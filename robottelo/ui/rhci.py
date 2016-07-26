@@ -9,6 +9,7 @@ from robottelo.ui.base import Base
 from robottelo.ui.locators import locators
 from robottelo.common.helpers import get_server_url
 from selenium.webdriver.support.select import Select
+from selenium.common.exceptions import WebDriverException
 import requests
 import socket, errno
 
@@ -61,7 +62,6 @@ class RHCI(Base):
         # cfme_install_loc is a kwargs, apologies for the potential confusion
         cfme_install_locator = interp_loc('rhci.cfme_install_on', cfme_install_loc)
         rhsm_sat_radio_loc = interp_loc('rhci.rhsm_satellite_radio', rhsm_satellite_uuid)
-        sub_check_locs = [interp_loc('rhci.subscription_check', sub) for sub in rhsm_subs]
         # TODO: get rid of this locator once we have actual version checking
         rhai_present_locator = interp_loc('rhci.active_view', '1D. Access Insights')
 
@@ -116,13 +116,19 @@ class RHCI(Base):
             else:
                 self._page_redhat_login(rhsm_username, rhsm_password)
                 self._page_subscription_manager_apps(rhsm_sat_radio_loc)
-                self._page_select_subscriptions(sub_check_locs)
+                self._page_select_subscriptions(rhsm_subs)
             self._page_review_subscriptions()
             self._page_review_deployment()
         except:
             self.browser.get_screenshot_as_file(error_screenshot_name)
             raise
 
+
+    def scroll_to_element(self, app_loc):
+        # Try to scroll to the element.
+        # This is a HACK until we can update to the new robotello version.
+        elem = self.wait_until_element(app_loc)
+        self.browser.execute_script('arguments[0].scrollIntoView(true);', elem)
 
     def _page_software_selection(self, products):
         # RHCI: software selection page
@@ -435,7 +441,15 @@ class RHCI(Base):
         self.text_field_update(locators['rhci.ose_subdomain_name'], ose_subdomain_name)
 
         for app in ose_sample_apps:
-            self.click(interp_loc('rhci.ose_sample_app', app))
+            try:
+                app_loc = interp_loc('rhci.ose_sample_app', app)
+                self.click(app_loc)
+            except WebDriverException, wdex:
+                # Try to scroll to the element.
+                # This is a HACK until we can update to the new robotello version.
+                # self.click() in newer version will scroll automatically
+                self.scroll_to_element(app_loc)
+                self.click(app_loc)
 
         self.click(locators["rhci.next"])
 
@@ -466,12 +480,21 @@ class RHCI(Base):
         self.click(rhsm_sat_radio_loc)
         self.click(locators["rhci.next"])
 
-    def _page_select_subscriptions(self, sub_check_locs):
+    def _page_select_subscriptions(self, rhsm_subs):
         print "Selecting Subscriptions"
         # RHCI: Select Subscriptions
-        for sub_check_loc in sub_check_locs:
-            if self.wait_until_element(sub_check_loc):
-                self.click(sub_check_loc)
+
+        #sub_check_locs = [interp_loc('rhci.subscription_check', sub) for sub in rhsm_subs]
+        #for sub_check_loc in sub_check_locs:
+        for sub in rhsm_subs:
+            sub_loc = interp_loc('rhci.subscription_check', sub['pool_id']) 
+            if self.wait_until_element(sub_loc):
+                self.scroll_to_element(sub_loc) 
+                self.click(sub_loc)
+
+            sub_qty_attach_loc = interp_loc('rhci.subscription_quantity_to_attach', sub['pool_id']) 
+            if self.wait_until_element(sub_qty_attach_loc):
+                self.text_field_update(sub_qty_attach_loc, sub['quantity'])
         self.click(locators["rhci.next"])
 
     def _page_review_subscriptions(self):
