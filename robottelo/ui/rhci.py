@@ -9,6 +9,7 @@ from robottelo.ui.base import Base
 from robottelo.ui.locators import locators
 from robottelo.common.helpers import get_server_url
 from selenium.webdriver.support.select import Select
+from selenium.common.exceptions import WebDriverException
 import requests
 import socket, errno
 
@@ -47,7 +48,7 @@ class RHCI(Base):
                ose_available_vcpu=None, ose_available_ram=None, ose_available_disk=None,
                ose_number_master_nodes=None, ose_number_worker_nodes=None, ose_storage_type=None,
                ose_storage_name=None, ose_storage_host=None, ose_export_path=None,
-               ose_subdomain_name=None):
+               ose_subdomain_name=None, ose_sample_apps=None):
 
         """
         Creates a new RHCI deployment with the provided details.
@@ -61,7 +62,6 @@ class RHCI(Base):
         # cfme_install_loc is a kwargs, apologies for the potential confusion
         cfme_install_locator = interp_loc('rhci.cfme_install_on', cfme_install_loc)
         rhsm_sat_radio_loc = interp_loc('rhci.rhsm_satellite_radio', rhsm_satellite_uuid)
-        sub_check_locs = [interp_loc('rhci.subscription_check', sub) for sub in rhsm_subs]
         # TODO: get rid of this locator once we have actual version checking
         rhai_present_locator = interp_loc('rhci.active_view', '1D. Access Insights')
 
@@ -97,6 +97,17 @@ class RHCI(Base):
                                                       rhev_storage_type_loc, selfhosted_domain_name,
                                                       selfhosted_domain_address, selfhosted_domain_share_path)
 
+            if "openshift" in products:
+                self._page_openshift_node_configuration(
+                    ose_storage_size,  ose_number_master_nodes,
+                    ose_master_vcpu, ose_master_ram, ose_master_disk,
+                    ose_number_worker_nodes, ose_node_vcpu, ose_node_ram, ose_node_disk,
+                    ose_available_vcpu, ose_available_ram, ose_available_disk)
+
+                self._page_ose_configuration(
+                    ose_install_loc, ose_storage_type, ose_storage_host, ose_export_path,
+                    ose_username, ose_user_password, ose_subdomain_name, ose_sample_apps)
+
             if "cloudforms" in products:
                 self._page_cloudforms_configuration(cfme_install_locator, cfme_root_password, cfme_admin_password, cfme_db_password)
 
@@ -105,13 +116,19 @@ class RHCI(Base):
             else:
                 self._page_redhat_login(rhsm_username, rhsm_password)
                 self._page_subscription_manager_apps(rhsm_sat_radio_loc)
-                self._page_select_subscriptions(sub_check_locs)
+                self._page_select_subscriptions(rhsm_subs)
             self._page_review_subscriptions()
             self._page_review_deployment()
         except:
             self.browser.get_screenshot_as_file(error_screenshot_name)
             raise
 
+
+    def scroll_to_element(self, app_loc):
+        # Try to scroll to the element.
+        # This is a HACK until we can update to the new robotello version.
+        elem = self.wait_until_element(app_loc)
+        self.browser.execute_script('arguments[0].scrollIntoView(true);', elem)
 
     def _page_software_selection(self, products):
         # RHCI: software selection page
@@ -381,6 +398,61 @@ class RHCI(Base):
 
         self.click(locators["rhci.next"])
 
+    def _page_openshift_node_configuration(
+        self,
+        ose_storage_size,  ose_number_master_nodes,
+        ose_master_vcpu, ose_master_ram, ose_master_disk,
+        ose_number_worker_nodes, ose_node_vcpu, ose_node_ram, ose_node_disk,
+        ose_available_vcpu, ose_available_ram, ose_available_disk):
+
+        total_node_count = int(ose_number_master_nodes) + int(ose_number_worker_nodes)
+
+        # 1 Master node is the only supported configuration
+        if not self.is_element_visible(
+            interp_loc('rhci.ose_master_node_count', ose_number_master_nodes)):
+            raise Exception("OSE Master Node count is not set to {}".format(
+                ose_number_master_nodes))
+
+        self.click(interp_loc('rhci.ose_worker_node_count', ose_number_worker_nodes))
+        self.click(interp_loc('rhci.ose_worker_node_storage_size', ose_node_disk))
+
+        if not self.is_element_visible(interp_loc(
+            'rhci.ose_env_summary_node_count', total_node_count)):
+            raise Exception("The OSE node count is not set to {}".format(total_node_count))
+
+        self.click(locators["rhci.next"])
+
+    def _page_ose_configuration(
+        self,
+        ose_install_loc, ose_storage_type, ose_storage_host, ose_export_path,
+        ose_username, ose_user_password, ose_subdomain_name, ose_sample_apps):
+
+        if ose_install_loc == 'NFS':
+            self.click(locators['rhci.ose_docker_storage_type_nfs'])
+        elif ose_install_loc == 'Gluster':
+            self.click(locators['rhci.ose_docker_storage_type_gluster'])
+
+        self.text_field_update(locators['rhci.ose_docker_storage_host'], ose_storage_host)
+        self.text_field_update(locators['rhci.ose_docker_storage_export_path'], ose_storage_host)
+        self.text_field_update(locators['rhci.ose_docker_storage_export_path'], ose_export_path)
+        self.text_field_update(locators['rhci.ose_account_name'], ose_username)
+        self.text_field_update(locators['rhci.ose_password'], ose_user_password)
+        self.text_field_update(locators['rhci.ose_password_confirm'], ose_user_password)
+        self.text_field_update(locators['rhci.ose_subdomain_name'], ose_subdomain_name)
+
+        for app in ose_sample_apps:
+            try:
+                app_loc = interp_loc('rhci.ose_sample_app', app)
+                self.click(app_loc)
+            except WebDriverException, wdex:
+                # Try to scroll to the element.
+                # This is a HACK until we can update to the new robotello version.
+                # self.click() in newer version will scroll automatically
+                self.scroll_to_element(app_loc)
+                self.click(app_loc)
+
+        self.click(locators["rhci.next"])
+
     def _page_redhat_login(self, rhsm_username, rhsm_password):
         print "Customer Portal Login Page"
         # RHCI: Subscription Credentials page.
@@ -408,12 +480,21 @@ class RHCI(Base):
         self.click(rhsm_sat_radio_loc)
         self.click(locators["rhci.next"])
 
-    def _page_select_subscriptions(self, sub_check_locs):
+    def _page_select_subscriptions(self, rhsm_subs):
         print "Selecting Subscriptions"
         # RHCI: Select Subscriptions
-        for sub_check_loc in sub_check_locs:
-            if self.wait_until_element(sub_check_loc):
-                self.click(sub_check_loc)
+
+        #sub_check_locs = [interp_loc('rhci.subscription_check', sub) for sub in rhsm_subs]
+        #for sub_check_loc in sub_check_locs:
+        for sub in rhsm_subs:
+            sub_loc = interp_loc('rhci.subscription_check', sub['pool_id']) 
+            if self.wait_until_element(sub_loc):
+                self.scroll_to_element(sub_loc) 
+                self.click(sub_loc)
+
+            sub_qty_attach_loc = interp_loc('rhci.subscription_quantity_to_attach', sub['pool_id']) 
+            if self.wait_until_element(sub_qty_attach_loc):
+                self.text_field_update(sub_qty_attach_loc, sub['quantity'])
         self.click(locators["rhci.next"])
 
     def _page_review_subscriptions(self):
