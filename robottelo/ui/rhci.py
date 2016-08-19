@@ -377,6 +377,7 @@ class RHCI(Base):
             for _ in range(3):
                 self.wait_until_element_is_not_visible(locators['rhci.nfs_spinner'])
                 if 'rhev/storage' in self.browser.current_url:
+                    print "Re-clicking Next button on RHV Storage page."
                     self.click(locators["rhci.next"])
                 else:
                     break
