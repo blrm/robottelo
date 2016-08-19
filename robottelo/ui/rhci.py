@@ -373,6 +373,19 @@ class RHCI(Base):
                 self.text_field_update(locators["rhci.selfhosted_domain_share_path"],
                     selfhosted_domain_share_path)
             self.click(locators["rhci.next"])
+            # If still on the RHV Storage Configuration page, retry clicking Next
+            for _ in range(3):
+                self.wait_until_element_is_not_visible(locators['rhci.nfs_spinner'])
+                if 'rhev/storage' in self.browser.current_url:
+                    print "Re-clicking Next button on RHV Storage page."
+                    self.click(locators["rhci.next"])
+                else:
+                    break
+            else:
+                if self.wait_until_element(locators['rhci.alert_box'], timeout=5):
+                    element =  self.wait_until_element(locators['rhci.alert_box'])
+                    print element.text
+                raise Exception("Unable to proceed past RHV Storage Page")
 
     def _page_cloudforms_configuration(self, cfme_install_locator, cfme_root_password, cfme_admin_password, cfme_db_password):
         print "CloudForms Install Location page"
@@ -487,12 +500,12 @@ class RHCI(Base):
         #sub_check_locs = [interp_loc('rhci.subscription_check', sub) for sub in rhsm_subs]
         #for sub_check_loc in sub_check_locs:
         for sub in rhsm_subs:
-            sub_loc = interp_loc('rhci.subscription_check', sub['pool_id']) 
+            sub_loc = interp_loc('rhci.subscription_check', sub['pool_id'])
             if self.wait_until_element(sub_loc):
-                self.scroll_to_element(sub_loc) 
+                self.scroll_to_element(sub_loc)
                 self.click(sub_loc)
 
-            sub_qty_attach_loc = interp_loc('rhci.subscription_quantity_to_attach', sub['pool_id']) 
+            sub_qty_attach_loc = interp_loc('rhci.subscription_quantity_to_attach', sub['pool_id'])
             if self.wait_until_element(sub_qty_attach_loc):
                 self.text_field_update(sub_qty_attach_loc, sub['quantity'])
         self.click(locators["rhci.next"])

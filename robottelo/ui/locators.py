@@ -2059,6 +2059,8 @@ locators = LocatorDict({
         By.XPATH, "//input[@id='rhev_export_domain_path']"),
     "rhci.selfhosted_domain_share_path": (
         By.XPATH, "//input[@id='hosted_storage_path']"),
+    "rhci.nfs_spinner": (By.CLASS_NAME, 'spinner-md'),
+    "rhci.alert_box": (By.XPATH, "//div[contains(@class,'rhci-alert')]"),
     "rhci.bc_cloudforms": (
         By.XPATH,
         "//div[@class='wizard-block']//li[contains(.,'CloudForms')]/div"),
