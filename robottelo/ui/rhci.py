@@ -489,7 +489,10 @@ class RHCI(Base):
     def _page_subscription_manager_apps(self, rhsm_sat_radio_loc):
         print "Selecting Subscription Management Application"
         # RHCI: Subscription Management Application.
-        self.wait_until_element(rhsm_sat_radio_loc)
+        if not self.wait_until_element(rhsm_sat_radio_loc):
+            raise Exception('Unable to find the SMA on the current page')
+
+        self.scroll_to_element(rhsm_sat_radio_loc)
         self.click(rhsm_sat_radio_loc)
         self.click(locators["rhci.next"])
 
